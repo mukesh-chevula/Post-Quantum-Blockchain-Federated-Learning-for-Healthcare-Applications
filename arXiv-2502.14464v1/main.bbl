@@ -1,0 +1,906 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+Avanzi%
+\ \protect \BOthers {.}}{%
+Avanzi%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2019}}%
+}]{%
+kyber}
+\APACinsertmetastar {%
+kyber}%
+\begin{APACrefauthors}%
+Avanzi, R.%
+, Bos, J.%
+, Ducas, L.%
+, Kiltz, E.%
+, Lepoint, T.%
+, Lyubashevsky, V.%
+\BDBL {}Stehl{\'e}, D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2019}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {CRYSTALS-Kyber algorithm specifications and supporting documentation} {Crystals-kyber algorithm specifications and supporting documentation}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{NIST PQC Round}{2}{4}{1--43}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Bonawitz%
+\ \protect \BOthers {.}}{%
+Bonawitz%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2017}}%
+}]{%
+Practical_secure_aggregation}
+\APACinsertmetastar {%
+Practical_secure_aggregation}%
+\begin{APACrefauthors}%
+Bonawitz, K.%
+, Ivanov, V.%
+, Kreuter, B.%
+, Marcedone, A.%
+, McMahan, H\BPBI B.%
+, Patel, S.%
+\BDBL {}Seth, K.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2017}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Practical secure aggregation for privacy-preserving machine learning} {Practical secure aggregation for privacy-preserving machine learning}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {proceedings of the 2017 ACM SIGSAC Conference on Computer and Communications Security} {proceedings of the 2017 acm sigsac conference on computer and communications security}\ (\BPGS\ 1175--1191).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Castryck%
+\ \BBA {} Decru%
+}{%
+Castryck%
+\ \BBA {} Decru%
+}{%
+{\protect \APACyear {2023}}%
+}]{%
+An_efficient_key}
+\APACinsertmetastar {%
+An_efficient_key}%
+\begin{APACrefauthors}%
+Castryck, W.%
+\BCBT {}\ \BBA {} Decru, T.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {An efficient key recovery attack on SIDH} {An efficient key recovery attack on sidh}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Annual International Conference on the Theory and Applications of Cryptographic Techniques} {Annual international conference on the theory and applications of cryptographic techniques}\ (\BPGS\ 423--447).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Demetriou%
+\ \BBA {} Phil%
+}{%
+Demetriou%
+\ \BBA {} Phil%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+pqcrypto_library}
+\APACinsertmetastar {%
+pqcrypto_library}%
+\begin{APACrefauthors}%
+Demetriou%
+\BCBT {}\ \BBA {} Phil.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {pqcrypto: {Post}-quantum cryptography for {Python}.} {pqcrypto: {Post}-quantum cryptography for {Python}.}
+\newblock
+\begin{APACrefURL} [{2024-04-30}]\url{https://github.com/kpdemetriou/pqcrypto} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Engineering%
+\ \BBA {} (SEAR)%
+}{%
+Engineering%
+\ \BBA {} (SEAR)%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+Apple_pq3}
+\APACinsertmetastar {%
+Apple_pq3}%
+\begin{APACrefauthors}%
+Engineering, A\BPBI S.%
+\BCBT {}\ \BBA {} (SEAR), A.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {Blog - {iMessage} with {PQ3}: {The} new state of the art in quantum-secure messaging at scale - {Apple} {Security} {Research}.} {Blog - {iMessage} with {PQ3}: {The} new state of the art in quantum-secure messaging at scale - {Apple} {Security} {Research}.}
+\newblock
+\begin{APACrefURL} [{2024-03-03}]\url{https://security.apple.com/blog/imessage-pq3/} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+\APACcitebtitle {Ethereum blockchain}}{%
+\APACcitebtitle {Ethereum blockchain}}{%
+{\protect \APACyear {2024}}%
+}]{%
+Ethereum}
+\APACinsertmetastar {%
+Ethereum}%
+\APACrefbtitle {Ethereum blockchain.} {Ethereum blockchain.}
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\begin{APACrefURL} [{2024-05-10}]\url{https://ethereum.org/en/} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Fan%
+\ \protect \BOthers {.}}{%
+Fan%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+Blockchain-based_decentralized}
+\APACinsertmetastar {%
+Blockchain-based_decentralized}%
+\begin{APACrefauthors}%
+Fan, M.%
+, Zhang, Z.%
+, Li, Z.%
+, Sun, G.%
+, Yu, H.%
+\BCBL {}\ \BBA {} Guizani, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Blockchain-based decentralized and lightweight anonymous authentication for federated learning} {Blockchain-based decentralized and lightweight anonymous authentication for federated learning}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{IEEE Transactions on Vehicular Technology}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+FIPS203%
+}{%
+FIPS203%
+}{%
+{\protect \APACyear {2023}}%
+}]{%
+standard_kyber}
+\APACinsertmetastar {%
+standard_kyber}%
+\begin{APACrefauthors}%
+FIPS203, N.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Module-Lattice-based Key-Encapsulation Mechanism Standard} {Module-lattice-based key-encapsulation mechanism standard}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Federal Information Processing Standards Publication}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Fischlin%
+\ \BBA {} G{\"u}nther%
+}{%
+Fischlin%
+\ \BBA {} G{\"u}nther%
+}{%
+{\protect \APACyear {2014}}%
+}]{%
+Multi-stage_key_exchange}
+\APACinsertmetastar {%
+Multi-stage_key_exchange}%
+\begin{APACrefauthors}%
+Fischlin, M.%
+\BCBT {}\ \BBA {} G{\"u}nther, F.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2014}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Multi-stage key exchange and the case of Google's QUIC protocol} {Multi-stage key exchange and the case of google's quic protocol}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Proceedings of the 2014 ACM SIGSAC Conference on Computer and Communications Security} {Proceedings of the 2014 acm sigsac conference on computer and communications security}\ (\BPGS\ 1193--1204).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Gharavi%
+, Granjal%
+\BCBL {}\ \BBA {} Monteiro%
+}{%
+Gharavi%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2024}}%
+}]{%
+Post-Quantum_Blockchain_Security_for}
+\APACinsertmetastar {%
+Post-Quantum_Blockchain_Security_for}%
+\begin{APACrefauthors}%
+Gharavi, H.%
+, Granjal, J.%
+\BCBL {}\ \BBA {} Monteiro, E.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Post-Quantum Blockchain Security for the Internet of Things: Survey and Research Directions} {Post-quantum blockchain security for the internet of things: Survey and research directions}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{IEEE Communications Surveys \& Tutorials}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Grover%
+}{%
+Grover%
+}{%
+{\protect \APACyear {1996}}%
+}]{%
+grover1996fast}
+\APACinsertmetastar {%
+grover1996fast}%
+\begin{APACrefauthors}%
+Grover, L\BPBI K.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1996}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A fast quantum mechanical algorithm for database search} {A fast quantum mechanical algorithm for database search}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Proceedings of the twenty-eighth annual ACM symposium on Theory of computing} {Proceedings of the twenty-eighth annual acm symposium on theory of computing}\ (\BPGS\ 212--219).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Gurung%
+, Pokhrel%
+\BCBL {}\ \BBA {} Li%
+}{%
+Gurung%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+Performance_Analysis}
+\APACinsertmetastar {%
+Performance_Analysis}%
+\begin{APACrefauthors}%
+Gurung, D.%
+, Pokhrel, S\BPBI R.%
+\BCBL {}\ \BBA {} Li, G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Performance Analysis and Evaluation of Post Quantum Secure Blockchain Federated Learning} {Performance analysis and evaluation of post quantum secure blockchain federated learning}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{arXiv preprint arXiv:2306.14772}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Helder%
+\ \BBA {} Eijs%
+}{%
+Helder%
+\ \BBA {} Eijs%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+pycryptodome}
+\APACinsertmetastar {%
+pycryptodome}%
+\begin{APACrefauthors}%
+Helder%
+\BCBT {}\ \BBA {} Eijs.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {pycryptodome: {Cryptographic} library for {Python}.} {pycryptodome: {Cryptographic} library for {Python}.}
+\newblock
+\begin{APACrefURL} [{2024-04-30}]\url{https://www.pycryptodome.org} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+HIGHer%
+}{%
+HIGHer%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+source_code}
+\APACinsertmetastar {%
+source_code}%
+\begin{APACrefauthors}%
+HIGHer.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {PQBFL: implementation of {Post}-quantum and blockchain-based protocol for FL.} {Pqbfl: implementation of {Post}-quantum and blockchain-based protocol for fl.}
+\newblock
+\begin{APACrefURL} [{2024-07-31}]\url{https://github.com/HIGH0101/PQBFL/tree/main} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Hu%
+, Salcic%
+, Sun%
+, Dobbie%
+\BCBL {}\ \BBA {} Zhang%
+}{%
+Hu%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+SIA_attack}
+\APACinsertmetastar {%
+SIA_attack}%
+\begin{APACrefauthors}%
+Hu, H.%
+, Salcic, Z.%
+, Sun, L.%
+, Dobbie, G.%
+\BCBL {}\ \BBA {} Zhang, X.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Source inference attacks in federated learning} {Source inference attacks in federated learning}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {2021 IEEE International Conference on Data Mining (ICDM)} {2021 ieee international conference on data mining (icdm)}\ (\BPGS\ 1102--1107).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Krawczyk%
+}{%
+Krawczyk%
+}{%
+{\protect \APACyear {2010}}%
+}]{%
+Cryptographic_extraction}
+\APACinsertmetastar {%
+Cryptographic_extraction}%
+\begin{APACrefauthors}%
+Krawczyk, H.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2010}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Cryptographic extraction and key derivation: The HKDF scheme} {Cryptographic extraction and key derivation: The hkdf scheme}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Annual Cryptology Conference} {Annual cryptology conference}\ (\BPGS\ 631--648).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Kret%
+\ \BBA {} Schmidt%
+}{%
+Kret%
+\ \BBA {} Schmidt%
+}{%
+{\protect \APACyear {2023}}%
+}]{%
+Signal_pqxdh}
+\APACinsertmetastar {%
+Signal_pqxdh}%
+\begin{APACrefauthors}%
+Kret, E.%
+\BCBT {}\ \BBA {} Schmidt, R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+\APACrefbtitle {The PQXDH Key Agreement Protocol.} {The pqxdh key agreement protocol.}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Moody%
+, Perlner%
+, Regenscheid%
+, Robinson%
+\BCBL {}\ \BBA {} Cooper%
+}{%
+Moody%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2024}}%
+}]{%
+Transition_to_Post-Quantum}
+\APACinsertmetastar {%
+Transition_to_Post-Quantum}%
+\begin{APACrefauthors}%
+Moody, D.%
+, Perlner, R.%
+, Regenscheid, A.%
+, Robinson, A.%
+\BCBL {}\ \BBA {} Cooper, D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {Transition to Post-Quantum Cryptography Standards} {Transition to post-quantum cryptography standards}\ \APACbVolEdTR{}{\BTR{}}.
+\newblock
+\APACaddressInstitution{}{National Institute of Standards and Technology}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Mothukuri%
+\ \protect \BOthers {.}}{%
+Mothukuri%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+A_survey_on_security}
+\APACinsertmetastar {%
+A_survey_on_security}%
+\begin{APACrefauthors}%
+Mothukuri, V.%
+, Parizi, R\BPBI M.%
+, Pouriyeh, S.%
+, Huang, Y.%
+, Dehghantanha, A.%
+\BCBL {}\ \BBA {} Srivastava, G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A survey on security and privacy of federated learning} {A survey on security and privacy of federated learning}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Future Generation Computer Systems}{115}{}{619--640}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Qammar%
+, Karim%
+, Ning%
+\BCBL {}\ \BBA {} Ding%
+}{%
+Qammar%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+Securing_federated}
+\APACinsertmetastar {%
+Securing_federated}%
+\begin{APACrefauthors}%
+Qammar, A.%
+, Karim, A.%
+, Ning, H.%
+\BCBL {}\ \BBA {} Ding, J.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Securing federated learning with blockchain: a systematic literature review} {Securing federated learning with blockchain: a systematic literature review}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Artificial Intelligence Review}{56}{5}{3951--3985}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Rehman%
+, Salah%
+, Damiani%
+\BCBL {}\ \BBA {} Svetinovic%
+}{%
+Rehman%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2020}}%
+}]{%
+Towards_blockchain-based}
+\APACinsertmetastar {%
+Towards_blockchain-based}%
+\begin{APACrefauthors}%
+Rehman, M\BPBI H.%
+, Salah, K.%
+, Damiani, E.%
+\BCBL {}\ \BBA {} Svetinovic, D.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2020}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Towards blockchain-based reputation-aware federated learning} {Towards blockchain-based reputation-aware federated learning}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {IEEE INFOCOM 2020-IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)} {Ieee infocom 2020-ieee conference on computer communications workshops (infocom wkshps)}\ (\BPGS\ 183--188).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Rescorla%
+}{%
+Rescorla%
+}{%
+{\protect \APACyear {2018}}%
+}]{%
+TLS}
+\APACinsertmetastar {%
+TLS}%
+\begin{APACrefauthors}%
+Rescorla, E.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2018}{}{}.
+\newblock
+\APACrefbtitle {The transport layer security (TLS) protocol version 1.3} {The transport layer security (tls) protocol version 1.3}\ \APACbVolEdTR{}{\BTR{}}.
+\newblock
+\APACaddressInstitution{}{Internet Engineering Task Force (IETF)}.
+\newblock
+\begin{APACrefURL} [{2024-09-17}]\url{https://www.rfc-editor.org/rfc/rfc8446} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Schmieg%
+\ \BBA {} Endignoux%
+}{%
+Schmieg%
+\ \BBA {} Endignoux%
+}{%
+{\protect \APACyear {2024}}%
+}]{%
+Google_blog}
+\APACinsertmetastar {%
+Google_blog}%
+\begin{APACrefauthors}%
+Schmieg, S\BPBI K.%
+\BCBT {}\ \BBA {} Endignoux, G.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+\APACrefbtitle {{Google}'s {Threat} model for {Post}-{Quantum} {Cryptography}.} {{Google}'s {Threat} model for {Post}-{Quantum} {Cryptography}.}
+\newblock
+\begin{APACrefURL} [{2024-05-10}]\url{https://bughunters.google.com/blog/5108747984306176/google-s-threat-model-for-post-quantum-cryptography} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Schwabe%
+}{%
+Schwabe%
+}{%
+{\protect \APACyear {{\protect \bibnodate {}}}}%
+}]{%
+NewHope}
+\APACinsertmetastar {%
+NewHope}%
+\begin{APACrefauthors}%
+Schwabe, P.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{{\protect \bibnodate {}}}{}{}.
+\newblock
+\APACrefbtitle {{NewHope: A key-exchange protocol based on the Ring-Learning-with-Errors (Ring-LWE)}.} {{NewHope: A key-exchange protocol based on the Ring-Learning-with-Errors (Ring-LWE)}.}
+\newblock
+\begin{APACrefURL} [{2024-05-17}]\url{https://newhopecrypto.org/} \end{APACrefURL}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Shokri%
+, Stronati%
+, Song%
+\BCBL {}\ \BBA {} Shmatikov%
+}{%
+Shokri%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2017}}%
+}]{%
+MIA_attack}
+\APACinsertmetastar {%
+MIA_attack}%
+\begin{APACrefauthors}%
+Shokri, R.%
+, Stronati, M.%
+, Song, C.%
+\BCBL {}\ \BBA {} Shmatikov, V.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2017}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Membership inference attacks against machine learning models} {Membership inference attacks against machine learning models}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {2017 IEEE symposium on security and privacy (SP)} {2017 ieee symposium on security and privacy (sp)}\ (\BPGS\ 3--18).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Shor%
+}{%
+Shor%
+}{%
+{\protect \APACyear {1994}}%
+}]{%
+shor1994algorithms}
+\APACinsertmetastar {%
+shor1994algorithms}%
+\begin{APACrefauthors}%
+Shor, P\BPBI W.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1994}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Algorithms for quantum computation: discrete logarithms and factoring} {Algorithms for quantum computation: discrete logarithms and factoring}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Proceedings 35th annual symposium on foundations of computer science} {Proceedings 35th annual symposium on foundations of computer science}\ (\BPGS\ 124--134).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Stebila%
+, Fluhrer%
+\BCBL {}\ \BBA {} Gueron%
+}{%
+Stebila%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2023}}%
+}]{%
+hybrid_key_exchange_TLS_1.3}
+\APACinsertmetastar {%
+hybrid_key_exchange_TLS_1.3}%
+\begin{APACrefauthors}%
+Stebila, D.%
+, Fluhrer, S.%
+\BCBL {}\ \BBA {} Gueron, S.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2023}{{\APACmonth{09}}}{7}.
+\newblock
+\APACrefbtitle {{Hybrid key exchange in TLS 1.3}} {{Hybrid key exchange in TLS 1.3}}\ \APACbVolEdTR {}{Internet-Draft\ \BNUM\ draft-ietf-tls-hybrid-design-09}.
+\newblock
+\APACaddressInstitution{}{Internet Engineering Task Force}.
+\newblock
+\begin{APACrefURL} \url{https://datatracker.ietf.org/doc/draft-ietf-tls-hybrid-design/09/} \end{APACrefURL}
+\newblock
+\APACrefnote{Work in Progress}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Stebila%
+\ \BBA {} Mosca%
+}{%
+Stebila%
+\ \BBA {} Mosca%
+}{%
+{\protect \APACyear {2016}}%
+}]{%
+OQS_project}
+\APACinsertmetastar {%
+OQS_project}%
+\begin{APACrefauthors}%
+Stebila, D.%
+\BCBT {}\ \BBA {} Mosca, M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2016}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Post-quantum key exchange for the internet and the open quantum safe project} {Post-quantum key exchange for the internet and the open quantum safe project}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {International Conference on Selected Areas in Cryptography} {International conference on selected areas in cryptography}\ (\BPGS\ 14--37).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Wang%
+\ \protect \BOthers {.}}{%
+Wang%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+Secure-enhanced}
+\APACinsertmetastar {%
+Secure-enhanced}%
+\begin{APACrefauthors}%
+Wang, W.%
+, Memon, F\BPBI H.%
+, Lian, Z.%
+, Yin, Z.%
+, Gadekallu, T\BPBI R.%
+, Pham, Q\BHBI V.%
+\BDBL {}Su, C.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Secure-enhanced federated learning for AI-empowered electric vehicle energy prediction} {Secure-enhanced federated learning for ai-empowered electric vehicle energy prediction}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{IEEE Consumer Electronics Magazine}{12}{2}{27--34}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+G.~Xu%
+, Dong%
+, Ma%
+, Liu%
+\BCBL {}\ \BBA {} Cliff%
+}{%
+G.~Xu%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2022}}%
+}]{%
+A_certificateless_signcryption}
+\APACinsertmetastar {%
+A_certificateless_signcryption}%
+\begin{APACrefauthors}%
+Xu, G.%
+, Dong, J.%
+, Ma, C.%
+, Liu, J.%
+\BCBL {}\ \BBA {} Cliff, U\BPBI G\BPBI O.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2022}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A certificateless signcryption mechanism based on blockchain for edge computing} {A certificateless signcryption mechanism based on blockchain for edge computing}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{IEEE Internet of Things Journal}{10}{14}{11960--11974}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+P.~Xu%
+, Hu%
+, Chen%
+, Wang%
+\BCBL {}\ \BBA {} Jin%
+}{%
+P.~Xu%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2022}}%
+}]{%
+LaF}
+\APACinsertmetastar {%
+LaF}%
+\begin{APACrefauthors}%
+Xu, P.%
+, Hu, M.%
+, Chen, T.%
+, Wang, W.%
+\BCBL {}\ \BBA {} Jin, H.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2022}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {LaF: Lattice-based and communication-efficient federated learning} {Laf: Lattice-based and communication-efficient federated learning}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{IEEE Transactions on Information Forensics and Security}{17}{}{2483--2496}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Y.~Xu%
+\ \protect \BOthers {.}}{%
+Y.~Xu%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+BESIFL}
+\APACinsertmetastar {%
+BESIFL}%
+\begin{APACrefauthors}%
+Xu, Y.%
+, Lu, Z.%
+, Gai, K.%
+, Duan, Q.%
+, Lin, J.%
+, Wu, J.%
+\BCBL {}\ \BBA {} Choo, K\BHBI K\BPBI R.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {BESIFL: Blockchain-empowered secure and incentive federated learning paradigm in IoT} {Besifl: Blockchain-empowered secure and incentive federated learning paradigm in iot}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{IEEE Internet of Things Journal}{10}{8}{6561--6573}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Yang%
+, Chen%
+, Tu%
+\BCBL {}\ \BBA {} Yang%
+}{%
+Yang%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2022}}%
+}]{%
+A_post-quantum_secure}
+\APACinsertmetastar {%
+A_post-quantum_secure}%
+\begin{APACrefauthors}%
+Yang, S.%
+, Chen, Y.%
+, Tu, S.%
+\BCBL {}\ \BBA {} Yang, Z.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2022}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A post-quantum secure aggregation for federated learning} {A post-quantum secure aggregation for federated learning}.{\BBCQ}
+\newblock
+\BIn{} \APACrefbtitle {Proceedings of the 2022 12th International Conference on Communication and Network Security} {Proceedings of the 2022 12th international conference on communication and network security}\ (\BPGS\ 117--124).
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Zhang%
+\ \protect \BOthers {.}}{%
+Zhang%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2021}}%
+}]{%
+A_survey_on_federated}
+\APACinsertmetastar {%
+A_survey_on_federated}%
+\begin{APACrefauthors}%
+Zhang, C.%
+, Xie, Y.%
+, Bai, H.%
+, Yu, B.%
+, Li, W.%
+\BCBL {}\ \BBA {} Gao, Y.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2021}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A survey on federated learning} {A survey on federated learning}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Knowledge-Based Systems}{216}{}{106775}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Zhou%
+\ \protect \BOthers {.}}{%
+Zhou%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2024}}%
+}]{%
+Blockchain_and_signcryption}
+\APACinsertmetastar {%
+Blockchain_and_signcryption}%
+\begin{APACrefauthors}%
+Zhou, Z.%
+, Tian, Y.%
+, Xiong, J.%
+, Peng, C.%
+, Li, J.%
+\BCBL {}\ \BBA {} Yang, N.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2024}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Blockchain and signcryption enabled asynchronous federated learning framework in fog computing} {Blockchain and signcryption enabled asynchronous federated learning framework in fog computing}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Digital Communications and Networks}{}{}{}.
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}
