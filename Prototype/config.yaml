@@ -1,0 +1,187 @@
+# PQBFL Prototype Configuration
+
+# Cryptographic Parameters
+crypto:
+  # Post-quantum KEM (options: kyber512, kyber768, kyber1024)
+  kyber_variant: "kyber768"
+
+  # Classical ECDH curve (options: P-256, P-384, secp256k1)
+  ecdh_curve: "P-256"
+
+  # Key derivation function
+  kdf:
+    algorithm: "HKDF"
+    hash: "SHA384"
+
+  # Symmetric encryption (for model payloads)
+  symmetric:
+    algorithm: "AES-GCM"
+    key_size: 256
+
+  # Digital signatures
+  signature:
+    algorithm: "ECDSA"
+    curve: "secp256k1"
+    hash: "SHA256"
+
+# Ratcheting Configuration
+ratcheting:
+  # Number of symmetric ratchets before asymmetric ratchet
+  # L_j in the paper (can be fixed or variable)
+  symmetric_threshold: 10
+
+  # Whether to use variable thresholds
+  variable_threshold: false
+
+  # Security level (affects key sizes)
+  security_level: 128 # bits
+
+# Blockchain Configuration
+blockchain:
+  # Block generation time (seconds)
+  block_time: 2.0
+
+  # Gas costs (in arbitrary units)
+  gas_costs:
+    register_project: 250000
+    register_client: 75000
+    publish_task: 260000
+    update_model: 235000
+    feedback_model: 215000
+
+  # Transaction confirmation blocks
+  confirmations: 1
+
+  # Reputation scoring
+  reputation:
+    initial_score: 0
+    reward_good_model: 10
+    penalty_bad_model: -15
+    min_score: 0
+    max_score: 1000
+
+# Federated Learning Configuration
+federated_learning:
+  # Number of clients/participants
+  n_clients: 5
+
+  # Number of training rounds
+  rounds: 10
+
+  # Local training epochs per round
+  local_epochs: 1
+
+  # Batch size for local training
+  batch_size: 32
+
+  # Learning rate
+  learning_rate: 0.01
+
+  # Server learning rate (for parameter server mode)
+  server_lr: 0.01
+
+  # Minimum clients required per round
+  min_clients: 3
+
+  # Client selection strategy (options: all, random, reputation)
+  client_selection: "all"
+
+  # Model architecture
+  model:
+    type: "MLP"
+    hidden_layers: [64, 32]
+    activation: "ReLU"
+    dropout: 0.0
+
+# Dataset Configuration
+dataset:
+  # Dataset type (options: mnist, cifar10, healthcare, synthetic)
+  name: "healthcare"
+
+  # Healthcare-specific settings
+  healthcare:
+    condition: "Ischemic heart disease"
+    code: null
+    data_path: "../Federated Learning Demo/synthea_sample_data_csv_latest"
+
+  # Data split
+  train_test_split: 0.2
+
+  # Data distribution among clients (options: iid, non_iid)
+  distribution: "iid"
+
+  # Random seed for reproducibility
+  random_seed: 42
+
+# Communication Configuration
+communication:
+  # On-chain: blockchain transactions (metadata only)
+  on_chain:
+    enabled: true
+    hash_algorithm: "SHA256"
+
+  # Off-chain: encrypted model transfer
+  off_chain:
+    enabled: true
+    compression: false # Future: compress models before encryption
+    max_payload_size: 100000000 # 100 MB
+
+# Logging and Output
+logging:
+  level: "INFO" # DEBUG, INFO, WARNING, ERROR
+  console: true
+  file: true
+  log_dir: "logs"
+
+# Results and Artifacts
+output:
+  save_models: true
+  save_history: true
+  save_blockchain: true
+  results_dir: "results"
+
+  # What to save
+  artifacts:
+    - "global_model"
+    - "client_models"
+    - "training_history"
+    - "blockchain_state"
+    - "crypto_metrics"
+    - "communication_logs"
+
+# Performance Monitoring
+monitoring:
+  # Track computation time
+  track_computation: true
+
+  # Track communication overhead
+  track_communication: true
+
+  # Track gas costs
+  track_gas: true
+
+  # Track model metrics
+  track_metrics:
+    - "accuracy"
+    - "loss"
+    - "auc"
+
+  # Benchmark against baselines
+  run_baselines: true
+  baselines:
+    - "centralized_lr"
+    - "centralized_xgboost"
+
+# Security and Privacy
+security:
+  # Enable all security features
+  encryption_enabled: true
+  authentication_enabled: true
+  replay_protection: true
+
+  # Timestamp tolerance (seconds) for replay protection
+  timestamp_tolerance: 30
+
+  # Enable reputation-based filtering
+  reputation_filtering: true
+  min_reputation_score: -50
