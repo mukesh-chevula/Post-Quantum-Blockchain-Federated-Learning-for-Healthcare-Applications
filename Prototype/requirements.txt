@@ -1,0 +1,34 @@
+# PQBFL Prototype Dependencies
+
+# Post-Quantum Cryptography
+kyber-py>=0.1.0
+pycryptodome>=3.19.0
+
+# Classical Cryptography
+cryptography>=41.0.0
+ecdsa>=0.18.0
+
+# Blockchain & Web3
+web3>=6.11.0
+eth-hash>=0.5.0
+eth-utils>=2.2.0
+
+# Federated Learning & ML
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+
+# Data Processing
+joblib>=1.3.0
+
+# Utilities
+pyyaml>=6.0.0
+tqdm>=4.66.0
+colorlog>=6.7.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
