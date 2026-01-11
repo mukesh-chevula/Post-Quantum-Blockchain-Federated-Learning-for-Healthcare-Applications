@@ -68,7 +68,12 @@ This contract stores project metadata, participant registration hashes (e.g., ha
 
 ## How to use (notes & implementation pointers)
 
-This repository currently contains only a README draft. The original paper references an implementation on GitHub (HIGHer, 2024). For a working implementation you would typically:
+This repository includes a small reference implementation under:
+
+- `pqbfl_project/` (baseline implementation)
+- `pqbfl_project new/` (enhanced implementation)
+
+The original paper references an implementation on GitHub (HIGHer, 2024). Independently of that, for a working implementation you would typically:
 
 1. Deploy the smart contract to a testnet or private chain. Ensure the contract records hashed public keys and event logs for clients to watch.
 2. Have the server generate KEM (Kyber) and ECDH key pairs and publish hashes of their public keys in the RegisterProject transaction.
@@ -80,6 +85,31 @@ Suggested libraries and tools
 
 - Python: pqcrypto (Kyber), PyCryptodome for AES/HMAC, web3.py for smart-contract interaction.
 - Smart contracts: Solidity + Hardhat or Truffle for development and gas estimation.
+
+## Improvements in `pqbfl_project new/` vs `pqbfl_project/`
+
+The `pqbfl_project new/` folder is an iteration over `pqbfl_project/` with the following practical improvements:
+
+- **Modernized crypto primitives for the off-chain channel**
+	- **AEAD:** switched from **AES-256-GCM** to **ChaCha20-Poly1305**.
+	- **ECDH:** added **X25519 (Curve25519)** support and migrated session establishment to X25519.
+	- **Signatures (off-chain):** added **Ed25519** signing/verification and migrated the demo protocol away from Ethereum-style ECDSA address recovery for off-chain messages.
+
+- **Hashing / KDF upgrades (with safe fallback)**
+	- Introduced a protocol-wide `hash32()` (prefers **BLAKE3-256**, falls back to **SHA-256**).
+	- Updated HKDF extract/expand and the symmetric ratchet PRF to prefer **HMAC-(BLAKE3-256)** (fallback to HMAC-SHA256).
+	- Added `blake3` to Python dependencies.
+
+- **More realistic FL simulation knobs**
+	- Added **partial participation** (client participation rate) and a simple **label-flip poisoning** toggle.
+	- Exposed dataset/model seeds and training hyperparameters (LR, epochs, batch size, L2).
+
+- **More robust aggregation options**
+	- Added **coordinate-wise median** and **trimmed mean** as alternatives to FedAvg.
+	- Added optional **L2 regularization** in the logistic-regression SGD trainer.
+
+- **Streamlit UI enhancements**
+	- UI now exposes the above simulation/training/aggregation settings so experiments can be configured without editing code.
 
 ## Limitations and future work
 

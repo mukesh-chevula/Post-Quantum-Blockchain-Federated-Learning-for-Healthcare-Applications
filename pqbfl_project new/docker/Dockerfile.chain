@@ -1,0 +1,13 @@
+FROM node:18-alpine
+
+ENV HARDHAT_DISABLE_TELEMETRY=1 \
+    CI=1
+
+WORKDIR /workspace/chain
+
+COPY chain/package.json chain/package-lock.json ./
+RUN npm ci
+
+EXPOSE 8545
+
+CMD ["npx", "hardhat", "node", "--hostname", "0.0.0.0", "--port", "8545"]

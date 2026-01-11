@@ -1,0 +1,35 @@
+services:
+  chain:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.chain
+    ports:
+      - "9545:8545"
+    environment:
+      HARDHAT_DISABLE_TELEMETRY: "1"
+      CI: "1"
+      HARDHAT_LOCALHOST_URL: "http://chain:8545"
+    volumes:
+      - ../chain:/workspace/chain
+      - chain_node_modules_new:/workspace/chain/node_modules
+    working_dir: /workspace/chain
+
+  python:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.python
+    ports:
+      - "9501:8501"
+    environment:
+      PQBFL_CHAIN_URL: "http://chain:8545"
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ../python:/workspace/python
+      - ../chain:/workspace/chain:ro
+    working_dir: /workspace/python
+    depends_on:
+      - chain
+
+volumes:
+  chain_node_modules_new:

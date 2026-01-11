@@ -12,6 +12,29 @@ What it includes:
 - Node.js 18+ (for Hardhat)
 - Python 3.9–3.12 recommended (the `pqcrypto` wheels used for ML‑KEM/Kyber are typically not available for Python 3.14)
 
+## Docker (recommended)
+This repo includes a ready-to-run Docker setup that starts:
+- a Hardhat node (chain)
+- the Streamlit UI (python)
+
+From the repo root:
+
+```bash
+./pqbfl_project/docker/docker-up.sh
+```
+
+Then open:
+- UI: http://localhost:8501
+- Chain RPC: http://localhost:8545
+
+To stop and remove containers/volumes:
+
+```bash
+./pqbfl_project/docker/docker-down.sh
+```
+
+## Manual run (without Docker)
+
 ## 2) Start the local blockchain
 In terminal 1:
 

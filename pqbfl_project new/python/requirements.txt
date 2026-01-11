@@ -1,0 +1,9 @@
+cryptography
+numpy
+pqcrypto
+web3
+eth-account
+streamlit
+pandas
+altair
+blake3
