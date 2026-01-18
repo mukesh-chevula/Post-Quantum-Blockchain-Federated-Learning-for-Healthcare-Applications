@@ -72,6 +72,42 @@
       "artifacts": [
         "PQBFL"
       ]
+    },
+    "/Users/mchevula/Desktop/PQBFL Latest/pqbfl_project new/chain/contracts/PQBFL.sol": {
+      "lastModificationDate": 1768279694171,
+      "contentHash": "3f53b8776dbdabfe231622b62b7dcd3b",
+      "sourceName": "contracts/PQBFL.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "PQBFL"
+      ]
     }
   }
 }

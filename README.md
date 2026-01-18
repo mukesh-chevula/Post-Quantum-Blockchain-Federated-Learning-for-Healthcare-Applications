@@ -1,6 +1,5 @@
 # PQBFL — Post-Quantum Blockchain-based Protocol for Federated Learning
 
-This repository contains a first-draft summary of the PQBFL protocol described in the paper: "PQBFL: A Post-Quantum Blockchain-based Protocol for Federated Learning" by Hadi Gharavi, Jorge Granjal, and Edmundo Monteiro (University of Coimbra).
 
 ## Overview
 

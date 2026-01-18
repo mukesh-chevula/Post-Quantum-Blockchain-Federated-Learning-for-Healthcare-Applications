@@ -7,3 +7,6 @@ __pycache__/
 .vscode/
 .idea/
 *.log
+3.9–3.12/
+#/
+Python/

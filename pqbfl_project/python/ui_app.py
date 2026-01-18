@@ -179,7 +179,7 @@ def main():
 
     st.set_page_config(page_title="PQBFL UI", layout="wide")
 
-    st.title("PQBFL: Post-Quantum Blockchain FL — Demo UI")
+    st.title("PQBFL: Post-Quantum Blockchain FL")
     st.caption("Local Hardhat chain + on/off-chain PQBFL flow + encrypted FL rounds")
 
     with st.sidebar:
