@@ -228,22 +228,134 @@ def main():
 
     result = st.session_state.last_result
     if result is not None:
-        st.success("Run completed")
-        st.write("Contract:", result.contract_address)
-        st.write("Initial accuracy:", f"{result.initial_accuracy:.4f}")
-        st.write("Final accuracy:", f"{result.final_accuracy:.4f}")
+        st.success("✅ Run completed successfully!")
+        
+        # Main metrics
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Contract Address", result.contract_address[:10] + "...")
+        with col2:
+            st.metric("Initial Accuracy", f"{result.initial_accuracy:.2%}")
+        with col3:
+            st.metric("Final Accuracy", f"{result.final_accuracy:.2%}")
 
     if st.session_state.last_result is not None:
-        st.subheader("Accuracy over rounds")
+        st.subheader("📊 Accuracy over rounds")
         r = st.session_state.last_result
         df = pd.DataFrame({"round": list(range(0, len(r.round_accuracies))), "accuracy": r.round_accuracies})
         chart = (
             alt.Chart(df)
             .mark_line(point=True)
             .encode(x=alt.X("round:Q", title="Round"), y=alt.Y("accuracy:Q", title="Accuracy", scale=alt.Scale(domain=[0, 1])))
-            .properties(height=320)
+            .properties(height=320, title="Model Accuracy Over FL Rounds")
         )
-        st.altair_chart(chart, width="stretch")
+        st.altair_chart(chart, use_container_width=True)
+        
+        # Transaction timing section
+        st.markdown("---")
+        st.subheader("⏱️ Real-Time Blockchain Transaction Timings")
+        
+        # Transaction statistics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Transactions", r.total_transactions)
+        with col2:
+            st.metric("Avg Time (ms)", f"{r.avg_transaction_time_ms:.2f}")
+        with col3:
+            st.metric("Min Time (ms)", f"{r.min_transaction_time_ms:.2f}")
+        with col4:
+            st.metric("Max Time (ms)", f"{r.max_transaction_time_ms:.2f}")
+        
+        # Display all transactions
+        if r.transaction_timings:
+            tx_df = pd.DataFrame(r.transaction_timings)
+            
+            # Format for display
+            display_df = tx_df.copy()
+            display_df["tx_hash"] = display_df["tx_hash"].str[:10] + "..."
+            display_df["round"] = display_df["round"].astype(str)
+            display_df["client"] = display_df["client"].apply(lambda x: "Server" if x == -1 else f"Client {x}")
+            display_df = display_df[["tx_type", "round", "client", "duration_ms", "gas_used"]]
+            display_df.columns = ["Transaction Type", "Round", "Participant", "Duration (ms)", "Gas Used"]
+            
+            st.dataframe(display_df, use_container_width=True, height=400)
+            
+            # Transaction type breakdown
+            st.markdown("### 📈 Transaction Type Analysis")
+            type_stats = tx_df.groupby("tx_type").agg({
+                "duration_ms": ["count", "mean", "min", "max", "std"],
+                "gas_used": ["mean", "max"]
+            }).round(2)
+            type_stats.columns = ["Count", "Avg Time (ms)", "Min Time (ms)", "Max Time (ms)", "Std Dev (ms)", "Avg Gas", "Max Gas"]
+            st.dataframe(type_stats, use_container_width=True)
+            
+            # Timing visualization by transaction type
+            fig_data = tx_df[["tx_type", "duration_ms"]].copy()
+            fig_data["transaction_number"] = range(1, len(fig_data) + 1)
+            
+            timing_chart = (
+                alt.Chart(fig_data)
+                .mark_circle(size=60)
+                .encode(
+                    x=alt.X("transaction_number:Q", title="Transaction Number"),
+                    y=alt.Y("duration_ms:Q", title="Duration (ms)"),
+                    color=alt.Color("tx_type:N", title="Transaction Type"),
+                    tooltip=["transaction_number", "tx_type", "duration_ms"]
+                )
+                .properties(height=300, title="Transaction Timing by Type")
+            )
+            st.altair_chart(timing_chart, use_container_width=True)
+        else:
+            st.info("No transaction timing data available")
+
+        # Off-chain operation timing section
+        st.markdown("---")
+        st.subheader("⚙️ Off-Chain Operation Timings")
+
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Operations", r.total_operations)
+        with col2:
+            st.metric("Avg Time (ms)", f"{r.avg_operation_time_ms:.2f}")
+        with col3:
+            st.metric("Min Time (ms)", f"{r.min_operation_time_ms:.2f}")
+        with col4:
+            st.metric("Max Time (ms)", f"{r.max_operation_time_ms:.2f}")
+
+        if getattr(r, "operation_timings", None):
+            op_df = pd.DataFrame(r.operation_timings)
+
+            display_ops = op_df.copy()
+            display_ops["round"] = display_ops["round"].astype(str)
+            display_ops["client"] = display_ops["client"].apply(lambda x: "Server" if x == -1 else f"Client {x}")
+            display_ops = display_ops[["op_type", "round", "client", "duration_ms"]]
+            display_ops.columns = ["Operation", "Round", "Participant", "Duration (ms)"]
+
+            st.dataframe(display_ops, use_container_width=True, height=400)
+
+            st.markdown("### 🔍 Operation Type Analysis")
+            op_stats = op_df.groupby("op_type").agg({
+                "duration_ms": ["count", "mean", "min", "max", "std"]
+            }).round(2)
+            op_stats.columns = ["Count", "Avg Time (ms)", "Min Time (ms)", "Max Time (ms)", "Std Dev (ms)"]
+            st.dataframe(op_stats, use_container_width=True)
+
+            op_fig = op_df[["op_type", "duration_ms"]].copy()
+            op_fig["operation_number"] = range(1, len(op_fig) + 1)
+            op_chart = (
+                alt.Chart(op_fig)
+                .mark_circle(size=60)
+                .encode(
+                    x=alt.X("operation_number:Q", title="Operation Number"),
+                    y=alt.Y("duration_ms:Q", title="Duration (ms)"),
+                    color=alt.Color("op_type:N", title="Operation Type"),
+                    tooltip=["operation_number", "op_type", "duration_ms"]
+                )
+                .properties(height=300, title="Operation Timing by Type")
+            )
+            st.altair_chart(op_chart, use_container_width=True)
+        else:
+            st.info("No off-chain operation timing data available")
 
         with st.expander("Raw result"):
             st.json(r.as_dict())

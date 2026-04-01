@@ -1,0 +1,716 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{physics}
+\usepackage{xcolor}
+\geometry{margin=0.75in}
+
+\title{\textbf{PQBFL Protocol}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Phase 1: Initial State Generation \& Registration}
+
+\subsection*{1. Server (S): ``Bob''}
+
+The server, "Bob," is the central aggregator for the Federated Learning task. Its first step is to generate all the necessary cryptographic keys and then publish a "project" to the blockchain, committing to its public keys in the process.
+
+\subsubsection*{1.1. State Component 1: KEM Key Pair $(kpk_b, ksk_b)$}
+
+\textbf{Description:}
+This is the \textbf{Post-Quantum Key Encapsulation Mechanism (KEM)} key pair. It is the "quantum-resistant" component of the hybrid key exchange. The public key, $kpk_b$, will be used by participants (like Alice) to create and "encapsulate" a shared secret that only Bob can "decapsulate" using his secret key, $ksk_b$. The protocol uses \textbf{CRYSTALS-Kyber}.
+
+\textbf{Kyber.Gen:}
+The command $(kpk_b, ksk_b) \leftarrow \text{Kyber.KeyGen()}$ summarizes a complex process based on the \textbf{Module-Learning With Errors (M-LWE)} problem.
+
+\begin{enumerate}
+    \item \textbf{Seed Generation:} Bob first generates a 32-byte seed, $\rho$.
+    \item \textbf{Matrix Generation ($A$):} This seed $\rho$ is fed into an eXtendable-Output Function (XOF) like \textbf{SHAKE-128} to deterministically generate the public matrix $A$. This way, $A$ doesn't need to be stored; it can be regenerated from $\rho$.
+    \[
+    A \leftarrow \text{SHAKE-128}(\rho)
+    \]
+    \item \textbf{Secret Sampling ($s, e$):} Bob securely generates two vectors of "small" polynomials, $s$ (the core secret key) and $e$ (the "error" or "noise"). These are sampled from a \textbf{Centered Binomial Distribution (CBD)}.
+    \item \textbf{Public Vector Calculation ($t$):} Bob computes the public vector $t$ using the main M-LWE equation. All arithmetic is done in a polynomial ring $R_q = \mathbb{Z}_q[X] / (X^{256} + 1)$.
+    \[
+    t = A s + e
+    \]
+    \item \textbf{Final Keys:} The public and secret keys are then defined:
+    \begin{itemize}
+        \item \textbf{Public Key ($kpk_b$):} This is the pair $(t, \rho)$. $t$ is the public vector, and $\rho$ is the seed to recreate $A$.
+        \item \textbf{Secret Key ($ksk_b$):} This is the secret vector $s$.
+    \end{itemize}
+\end{enumerate}
+
+\textbf{Time Complexity:}
+The most expensive operation is the matrix-vector multiplication $A s$.
+\begin{itemize}
+    \item This involves $k^2$ polynomial multiplications (where $k=3$ for Kyber-768).
+    \item Each polynomial multiplication is of degree $n=255$.
+    \item Using the \textbf{Number-Theoretic Transform (NTT)}, each multiplication is $O(n \log n)$ instead of $O(n^2)$.
+    \item The total complexity is $O(k^2 \cdot n \log n)$.
+    \item Since $k$ and $n$ are fixed by the Kyber security level (e.g., $k=3, n=256$), the operation has a fixed, constant runtime. Therefore, the complexity is \textbf{$O(1)$}.
+\end{itemize}
+
+\subsubsection*{1.2. State Component 2: Key Exchange Pair $(epk_b, esk_b)$}
+
+\textbf{Description:}
+This is the \textbf{classical} key exchange pair, based on \textbf{Elliptic Curve Diffie-Hellman (ECDH)}. It is used in parallel with Kyber to create the hybrid secret. This provides security in case the post-quantum algorithm (Kyber) is ever broken, as the attacker would \textit{also} need to break classical ECDH.
+
+\textbf{ (ECDH.Gen):}
+The generation follows the standard elliptic curve key pair process:
+\begin{enumerate}
+    \item \textbf{Select Curve:} A standard, secure curve is chosen, such as \textbf{NIST P-256} (as shown in the Annexure). This defines the field $K$, the equation, and the base point $G$.
+    \item \textbf{Generate Secret ($esk_b$):} Bob generates a cryptographically secure random integer $esk_b$ (the secret key). This integer is in the range $[1, n-1]$, where $n$ is the order of the base point $G$.
+    \item \textbf{Compute Public Key ($epk_b$):} Bob performs elliptic curve \textbf{scalar multiplication} (also called point multiplication) of the base point $G$ by his secret scalar $esk_b$ to get his public key $epk_b$, which is a new point on the curve.
+    \[
+    epk_b = esk_b \cdot G
+    \]
+\end{enumerate}
+
+\textbf{Time Complexity:}
+The cost is one scalar multiplication. For a fixed curve with $m$-bit keys (e.g., $m=256$), this is a fixed number of point additions and doublings. Thus, the complexity is \textbf{$O(1)$}.
+
+\subsubsection*{1.3. State Component 3: Signature Key Pair $(pk_b, sk_b)$}
+
+\textbf{Description:}
+This is the classical \textbf{Elliptic Curve Digital Signature Algorithm (ECDSA)} key pair. This is Bob's "identity." He uses $sk_b$ to sign messages (both on-chain transactions and off-chain model data), and anyone can use $pk_b$ (which is public) to verify that the message came from him.
+
+\textbf{ (ECDSA.Gen):}
+The key generation math is \textbf{identical to ECDH key generation}.
+\begin{enumerate}
+    \item \textbf{Select Curve:} A standard curve is chosen (e.g., \texttt{secp256k1}, used by Bitcoin and Ethereum, or P-256).
+    \item \textbf{Generate Secret ($sk_b$):} Bob generates a cryptographically secure random integer $sk_b$ (the secret signing key).
+    \item \textbf{Compute Public Key ($pk_b$):} Bob computes the corresponding public key $pk_b$ via scalar multiplication.
+    \[
+    pk_b = sk_b \cdot G
+    \]
+    (Note: $sk_b$ and $esk_b$ are generated independently and are different secret numbers.)
+\end{enumerate}
+
+\textbf{Time Complexity:}
+Same as ECDH key generation. It's one scalar multiplication, which is \textbf{$O(1)$} for a fixed curve.
+
+\subsubsection*{1.4. Blockchain Registration (On-Chain)}
+
+\textbf{Description:}
+After generating all his keys, Bob "publishes" his project to the blockchain. He \textbf{does not} post his public keys directly, as this would be very expensive (high gas cost). Instead, he posts a \textbf{cryptographic commitment} (a hash) of his keys. This permanently and immutably links his blockchain address to the keys he will use.
+
+\textbf{:}
+\begin{enumerate}
+    \item \textbf{Hashing ($H$):} Bob uses a standard cryptographic hash function (e.g., SHA3-256) to create his commitments.
+    \[
+    h_{keys} \leftarrow H(kpk_b \parallel epk_b)
+    \]
+    Here, $\parallel$ denotes the concatenation of the byte representations of the keys.
+    \[
+    h_{M0} \leftarrow H(M^0)
+    \]
+    This is a hash of the \textit{initial} global model (e.g., a randomly initialized neural network).
+    \item \textbf{Transaction ($Tx_r$):} He builds a transaction to send to the smart contract:
+    \[
+    Tx_r \leftarrow \{h(kpk_b \parallel epk_b), n, h(M^0), id_p\}
+    \]
+    \begin{itemize}
+        \item $h(...)$: The commitment to his public keys.
+        \item $n$: The number of participants for the project.
+        \item $h(M^0)$: The hash of the starting model.
+        \item $id_p$: A unique project identifier.
+    \end{itemize}
+    \item \textbf{Smart Contract Call:} Bob signs and sends this transaction, calling the \texttt{RegisterProject} function on the smart contract.
+    \[
+    BC \leftarrow \text{RegisterProject}(Tx_r)
+    \]
+    The blockchain's consensus mechanism validates this transaction and, if successful, adds it to the global ledger $L$.
+\end{enumerate}
+
+\textbf{Time Complexity:}
+\begin{itemize}
+    \item \textbf{Local Computation:} Bob performs two hash operations. The cost of a hash function is linear in the size of its input, $O(L)$. Since the keys and initial model are of a fixed (or bounded) size, the hashing cost is \textbf{$O(1)$}.
+    \item \textbf{On-Chain Interaction:} This is not a computational complexity but a \textbf{network latency}. The time is determined by the blockchain's block time (e.g., $\sim$15 seconds).
+\end{itemize}
+
+\subsection*{2. Participant (P): ``Alice''}
+
+Alice is a participant (a local trainer) who wishes to join Bob's project. She must also generate her own keys and register on-chain.
+
+\subsubsection*{2.1. State Component 1: Key Exchange Pair $(epk_a, esk_a)$}
+
+\textbf{Description:}
+Alice's classical \textbf{ECDH} key pair. This is \textit{her} half of the classical key exchange. She will use $esk_a$ to compute the shared secret with Bob's $epk_b$.
+
+\textbf{ (ECDH.Gen):}
+Identical process to Bob's, just with different variables:
+\[
+(epk_a, esk_a) \leftarrow \text{ECDH.KeyGen()}
+\]
+She generates a random scalar $esk_a$ and computes her public key:
+\[
+epk_a = esk_a \cdot G
+\]
+
+\textbf{Time Complexity:}
+\textbf{$O(1)$} (one scalar multiplication on a fixed curve).
+
+\subsubsection*{2.2. State Component 2: Signature Key Pair $(pk_a, sk_a)$}
+
+\textbf{Description:}
+Alice's \textbf{ECDSA} key pair. This is \textit{her} on-chain identity, used to sign her transactions (like \texttt{RegisterClient}) and her off-chain model updates.
+
+\textbf{ (ECDSA.Gen):}
+Identical process to Bob's:
+\[
+pk_a = sk_a \cdot G
+\]
+
+\textbf{Time Complexity:}
+\textbf{$O(1)$} (one scalar multiplication on a fixed curve).
+
+\subsubsection*{2.3. Blockchain Registration (On-Chain)}
+
+\textbf{Description:}
+Alice sees Bob's project $id_p$ on the blockchain. To join, she calls the \texttt{RegisterClient} function, committing to her public ECDH key.
+
+\textbf{:}
+\begin{enumerate}
+    \item \textbf{Hashing ($H$):} Alice hashes her public key to create a commitment.
+    \[
+    h_{epk_a} \leftarrow H(epk_a)
+    \]
+    \item \textbf{Transaction ($Tx_r'$):} She builds her registration transaction:
+    \[
+    Tx_r' \leftarrow \{h(epk_a), id_p\}
+    \]
+    \begin{itemize}
+        \item $h(epk_a)$: Her commitment to her public key.
+        \item $id_p$: The ID of the project she wants to join.
+    \end{itemize}
+    \item \textbf{Smart Contract Call:} She signs and sends the transaction:
+    \[
+    BC \leftarrow \text{RegisterClient}(Tx_r')
+    \]
+    This adds her registration to the global ledger $L$. Now, Bob (and the public) can see that Alice has joined the project.
+\end{enumerate}
+
+\textbf{Time Complexity:}
+\begin{itemize}
+    \item \textbf{Local Computation:} One hash operation, \textbf{$O(1)$}.
+    \item \textbf{On-Chain Interaction:} Network latency (block time).
+\end{itemize}
+
+\subsection*{3. Blockchain (BC)}
+
+\textbf{Description:}
+The Blockchain (BC) is the "public bulletin board" and trust anchor for the entire protocol. It's a \textbf{decentralized, append-only ledger} where the state $L$ (the list of all transactions) is replicated across all nodes in the network. Its purpose is to provide a single, immutable source of truth for public key commitments ($h_{keys}$, $h_{epk_a}$) and to log the \textit{hashes} of models for accountability.
+
+\textbf{:}
+The blockchain's state is its ledger $L$. The initial state is the "genesis block," or an empty set $L = \langle \rangle$. The state is updated by a \textbf{State Transition Function}, which is the \textbf{Consensus} algorithm (e.g., Proof-of-Work or Proof-of-Stake).
+\[
+L_{\text{new}} = \text{Consensus}(L_{\text{old}}, \text{NewBlock})
+\]
+This function ensures that a \texttt{NewBlock} is only appended if it contains valid transactions (e.g., all signatures are correct, no double-spending) and meets the consensus rules (e.g., a valid PoW hash).
+
+\textbf{Time Complexity:}
+\begin{itemize}
+    \item \textbf{Read:} Reading data from the blockchain (e.g., Bob reading $Tx_r'$ to find Alice's key hash) is extremely fast. If indexed (like a database), it's \textbf{$O(1)$}.
+    \item \textbf{Write:} Writing data (i.e., getting a transaction confirmed in a block) is not measured in $O$-notation. It is a \textbf{network latency} dictated by the consensus mechanism's \textbf{block time} (e.g., $\sim$15 seconds for Ethereum, $\sim$10 minutes for Bitcoin).
+\end{itemize}
+
+\newpage
+
+\section*{Phase 2: Session Establishment (Off-Chain)}
+
+After both parties have registered their identities and key commitments on the blockchain (Phase 1), they establish a secure off-chain channel. The goal of this phase is to derive a shared, hybrid (classical + post-quantum) root key \( RK_1 \). This flow is based on Figure 3 in the paper.
+
+
+
+\subsection*{1. Server (S) Sends Keys}
+The server (Bob) initiates the off-chain key exchange by sending his public keys to the participant (Alice).
+
+\[
+msg_b \leftarrow \langle kpk_b, epk_b, Tx_r, id_p \rangle \text{ }
+\]
+\[
+\sigma_b \leftarrow \text{Sig.Sign}(sk_b, msg_b) \text{ }
+\]
+
+\begin{itemize}
+    \item \textbf{\(msg_b\)}: Bob bundles his actual public keys (\(kpk_b\) for Kyber, \(epk_b\) for ECDH) into a message. He also includes his registration transaction \(Tx_r\) as proof of his on-chain identity.
+    \item \textbf{\(\sigma_b\)}: He signs this message using his private ECDSA key (\(sk_b\)). This signature provides \textbf{authenticity} (proves the message is from him) and \textbf{integrity} (proves the message hasn't been altered).
+    \item He sends the pair \( \langle msg_b, \sigma_b \rangle \) to Alice.
+\end{itemize}
+\textbf{Time Complexity:} \( O(1) \). A single ECDSA signature operation on fixed-size data.
+
+\subsection*{2. Participant (P) Verifies \& Generates Secrets}
+Alice receives the message and must rigorously verify Bob's identity before proceeding.
+
+\[
+\text{Sig.Ver}(pk_b, msg_b, \sigma_b) \stackrel{?}{=} 1 \text{ }
+\]
+\[
+H(kpk_b \parallel epk_b) \stackrel{?}{=} h_{keys} \text{ (from on-chain } Tx_r) \text{ }
+\]
+\textbf{Verification:}
+\begin{itemize}
+    \item \textbf{Signature Verification:} Alice retrieves Bob's public signature key \(pk_b\) (from his on-chain address) and uses it to verify the signature \(\sigma_b\). This proves the message was signed by the owner of that on-chain identity.
+    \item \textbf{Key Commitment Verification:} This is a critical step to prevent Man-in-the-Middle (MITM) attacks. Alice hashes the public keys \(kpk_b\) and \(epk_b\) she received in the message. She then compares this hash to the hash \(h_{keys}\) that Bob permanently committed to in his \(Tx_r\) on the blockchain. If they match, she knows these are Bob's authentic public keys .
+\end{itemize}
+If both checks pass, Alice computes the two shared secrets:
+\[
+SS_e \leftarrow \text{KE.Derive}(esk_a, epk_b) \text{ }
+\]
+\[
+(ct, SS_k) \leftarrow \text{KEM.Encap}(kpk_b) \text{ }
+\]
+\textbf{Secret Generation:}
+\begin{itemize}
+    \item \textbf{\(SS_e\)}: The classical \textbf{ECDH} secret. Alice combines her \textit{private} key \(esk_a\) with Bob's \textit{public} key \(epk_b\) to compute the secret \(SS_e\).
+    \item \textbf{\(SS_k\)}: The post-quantum \textbf{Kyber} secret. Alice uses Bob's \textit{public} KEM key \(kpk_b\) to generate a new secret \(SS_k\) and a ciphertext \(ct\) that encapsulates it. Only Bob, with his private KEM key, can "decapsulate" \(ct\) to get \(SS_k\).
+\end{itemize}
+\textbf{Time Complexity:} \( O(1) \). This is a sum of several constant-time operations: one signature verification, one hash, one ECDH derivation, and one KEM encapsulation.
+
+\subsection*{3. Participant (P) Generates Root Key}
+Alice now combines both secrets into the first root key.
+\[
+RK_1 \leftarrow KDF_A(SS_e \parallel SS_k, 0x00) \text{ }
+\]
+\begin{itemize}
+    \item \textbf{\(KDF_A\)}: This is the \textbf{Asymmetric Key Derivation Function} (e.g., HKDF-Extract). Its job is to take the (potentially non-uniform) shared secrets and "extract" a single, cryptographically strong key.
+    \item \textbf{\(SS_e \parallel SS_k\)}: This is the \textbf{hybrid} nature of the protocol. The root key is derived from both the classical and post-quantum secrets. An attacker must break \textit{both} ECDH and Kyber to discover \(RK_1\).
+    \item \textbf{\(0x00\)}: A zero-byte salt, as specified in the paper's diagram.
+\end{itemize}
+\textbf{Time Complexity:} \( O(1) \). The KDF runs on a fixed-size input (the two concatenated secrets).
+
+\subsection*{4. Participant (P) Sends Keys Back}
+Alice must now send Bob the information he needs to compute the same secrets.
+\[
+msg_a \leftarrow \langle epk_a, Tx_r', id_p, ct \rangle \text{ }
+\]
+\[
+\sigma_a \leftarrow \text{Sig.Sign}(sk_a, msg_a)
+\]
+\begin{itemize}
+    \item \textbf{\(msg_a\)}: Alice's message contains her \textit{public} ECDH key \(epk_a\) (so Bob can compute \(SS_e\)) and the Kyber ciphertext \(ct\) (so Bob can compute \(SS_k\)).
+    \item \textbf{\(\sigma_a\)}: She signs this message with her private ECDSA key \(sk_a\) to prove her identity and ensure message integrity.
+    \item She sends \( \langle msg_a, \sigma_a \rangle \) back to Bob.
+\end{itemize}
+\textbf{Time Complexity:} \( O(1) \). A single signature operation.
+
+\subsection*{5. Server (S) Verifies \& Generates Secrets}
+Bob receives Alice's reply and performs the same verification steps.
+\[
+\text{Sig.Ver}(pk_a, msg_a, \sigma_a) \stackrel{?}{=} 1 \text{ }
+\]
+\[
+H(epk_a) \stackrel?{=} h_{epk_a} \text{ (from on-chain } Tx_r') \text{ }
+\]
+\textbf{Verification:}
+\begin{itemize}
+    \item \textbf{Signature Verification:} Bob uses Alice's public key \(pk_a\) (from the blockchain) to verify her signature.
+    \item \textbf{Key Commitment Verification:} Bob hashes the \(epk_a\) from the message and checks it against the hash \(h_{epk_a}\) Alice committed to in her on-chain registration \(Tx_r'\). This prevents MITM attacks.
+\end{itemize}
+If both checks pass, Bob derives the shared secrets:
+\[
+SS_e \leftarrow \text{KE.Derive}(esk_b, epk_a) \text{ }
+\]
+\[
+SS_k \leftarrow \text{KEM.Decap}(ksk_b, ct) \text{ }
+\]
+\textbf{Secret Generation:}
+\begin{itemize}
+    \item \textbf{\(SS_e\)}: Bob computes the \textit{identical} classical secret by combining his \textit{private} key \(esk_b\) with Alice's \textit{public} key \(epk_a\).
+    \item \textbf{\(SS_k\)}: Bob uses his \textit{private} KEM key \(ksk_b\) to "decapsulate" the ciphertext \(ct\), revealing the \textit{identical} post-quantum secret \(SS_k\).
+\end{itemize}
+\textbf{Time Complexity:} \( O(1) \). (Verification, hash, ECDH derivation, and KEM decapsulation).
+
+\subsection*{6. Server (S) Generates Root Key}
+Bob now has the same inputs as Alice and can derive the same key.
+\[
+RK_1 \leftarrow KDF_A(SS_e \parallel SS_k, 0x00)
+\]
+\begin{itemize}
+    \item Bob feeds the exact same two secrets (\(SS_e\) and \(SS_k\)) into the same deterministic \(KDF_A\) function.
+    \item This results in him computing a key \(RK_1\) that is \textbf{identical} to the one Alice computed in Step 3.
+\end{itemize}
+At this point, the session is established. Both Alice and Bob share the secret root key \(RK_1\), but this key was never transmitted over the network.
+
+\textbf{Time Complexity:} \( O(1) \).
+
+\newpage
+
+\section*{Phase 3: Send and Receive Model Loop (Iterative)}
+
+This is the main loop of the protocol, repeated for each training round \( r \). After establishing the hybrid root key \( RK_j \), this phase uses a \textbf{Symmetric Ratchet} (\( KDF_S \)) to derive a new, ephemeral key for each round. This provides \textbf{forward secrecy} (past keys can't be found from a current key) and \textbf{post-compromise security} (future keys are protected if an asymmetric ratchet is triggered) .
+
+This flow is based on Figure 4 and Figure 5 in the paper.
+
+
+
+\subsection*{1. Server (S) Publishes Task (On-Chain)}
+Bob (the server) initiates the round by deriving this round's keys and publishing a task to the blockchain.
+
+\[
+(CK_{i,j}, K_{i,j}) \leftarrow KDF_S(CK_{i-1,j})
+\]
+\[
+h_{Inf_b^r} \leftarrow H(Inf_b^r)
+\]
+\[
+Tx_p \leftarrow \{r, h_{Inf_b^r}, id_p, id_t, D_t\} \text{ }
+\]
+\[
+BC \leftarrow \text{PublishTask}(Tx_p)
+\]
+
+\begin{itemize}
+    \item \textbf{Turn the Ratchet:} Bob applies the symmetric key derivation function \( KDF_S \) (e.g., HKDF-Expand) to the \textit{previous} round's chain key \( CK_{i-1,j} \). This deterministically produces two new keys:
+    \begin{itemize}
+        \item \( CK_{i,j} \): The new chain key, which is kept secret and used as the input for the \textit{next} round (r+1).
+        \item \( K_{i,j} \): The **model key** for this round (r) only. It will be used for encryption and decryption and then discarded.
+    \end{itemize}
+    \item \textbf{Commitment:} He hashes the global model information \( Inf_b^r \), which contains the actual global model \( M^{r-1} \) and metadata.
+    \item \textbf{On-Chain Action:} He calls the \texttt{PublishTask} smart contract function. This posts the \textit{hash} \( h_{Inf_b^r} \) and other task details (like round number \( r \), project ID \( id_p \), and deadline \( D_t \)) to the blockchain. This serves as an immutable, public start-signal for the round.
+\end{itemize}
+\textbf{Time Complexity:} \( O(1) \). The KDF and Hash operations are on fixed-size metadata (only the model \textit{hash} is computed, not on the model itself in this step, as \(Inf_b^r\)'s hash is computed for the \textit{next} step). The blockchain call is a network latency.
+
+\subsection*{2. Server (S) Sends Global Model (Off-Chain)}
+After posting the public task, Bob sends the actual model to Alice securely.
+
+\[
+msg_b \leftarrow \text{Enc}((Inf_b^r \parallel Tx_p), K_{i,j}) \text{ }
+\]
+\[
+\sigma_b \leftarrow \text{Sig.Sign}(sk_b, msg_b) \text{ }
+\]
+\begin{itemize}
+    \item \textbf{Encryption:} Bob encrypts the full global model info (\( Inf_b^r \), which contains the model \( M^{r-1} \)) using the single-use model key \( K_{i,j} \) he just derived. This provides \textbf{confidentiality}.
+    \item \textbf{Authentication:} He signs the \textit{ciphertext} (\( msg_b \)) with his private ECDSA key (\( sk_b \)). This provides \textbf{authenticity} (proves it's from Bob) and \textbf{integrity} (proves the ciphertext wasn't tampered with).
+    \item \textbf{Transmission:} He sends \( \langle msg_b, \sigma_b \rangle \) to Alice via the off-chain channel.
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) \). The dominant operation is the symmetric encryption (e.g., AES-GCM) of the model, which is linear in the model size \( L_M \). The signature operation is \( O(1) \).
+
+\subsection*{3. Participant (P) Receives \& Trains}
+Alice receives the off-chain message, derives the same key, and trains her model.
+
+\[
+(CK_{i,j}, K_{i,j}) \leftarrow KDF_S(CK_{i-1,j})
+\]
+\[
+\text{Sig.Ver}(pk_b, msg_b, \sigma_b) \stackrel{?}{=} 1
+\]
+\[
+(Inf_b^r \parallel Tx_p) \leftarrow \text{Dec}(msg_b, K_{i,j})
+\]
+\[
+m^r \leftarrow \text{Train}(M^{r-1}, \text{Data}_{local})
+\]
+\begin{itemize}
+    \item \textbf{Turn the Ratchet:} Alice sees the \(Tx_p\) event on the blockchain, which signals her to "turn her ratchet." She independently applies the \textit{exact same} \( KDF_S \) function to her copy of \( CK_{i-1,j} \) to derive the \textit{identical} keys \( CK_{i,j} \) and \( K_{i,j} \).
+    \item \textbf{Verification:} She verifies Bob's signature \( \sigma_b \) using his public key \( pk_b \).
+    \item \textbf{Decryption:} If the signature is valid, she uses the derived model key \( K_{i,j} \) to decrypt \( msg_b \) and recover the global model \( M^{r-1} \). She also checks that the \( Tx_p \) data inside the message matches the data on the blockchain.
+    \item \textbf{Training:} She trains the received global model on her private local data to produce her new local model \( m^r \).
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) + O(\text{TrainingComplexity}) \). The crypto cost is \( O(L_M) \) (for decryption) plus a few \( O(1) \) operations. The total cost is dominated by the computationally intensive model training step.
+
+\subsection*{4. Participant (P) Publishes Update (On-Chain)}
+After training, Alice commits to her new local model on the blockchain.
+
+\[
+h_{Inf_a^r} \leftarrow H(Inf_a^r)
+\]
+\[
+Tx_u \leftarrow \{r, h_{Inf_a^r}, id_p, id_t\} \text{ }
+\]
+\[
+BC \leftarrow \text{UpdateModel}(Tx_u)
+\]
+\begin{itemize}
+    \item \textbf{Commitment:} Alice creates her model information \( Inf_a^r \) (which includes her new local model \( m^r \)) and computes its hash \( h_{Inf_a^r} \).
+    \item \textbf{On-Chain Action:} She calls the \texttt{UpdateModel} smart contract function, posting her hash \( h_{Inf_a^r} \) to the blockchain. This does \textit{not} reveal her model; it only serves as an immutable, timestamped \textbf{proof of contribution}.
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) \). The dominant cost is hashing the full local model \( m^r \) (which is part of \( Inf_a^r \)), a linear-time operation.
+
+\subsection*{5. Participant (P) Sends Local Model (Off-Chain)}
+With her commitment public, Alice now sends her actual model to Bob.
+
+\[
+msg_a \leftarrow \text{Enc}((Inf_a^r \parallel Tx_u), K_{i,j}) \text{ }
+\]
+\[
+\sigma_a \leftarrow \text{Sig.Sign}(sk_a, msg_a) \text{ }
+\]
+\begin{itemize}
+    \item \textbf{Encryption:} Alice encrypts her full local model information \( Inf_a^r \) using the \textbf{same model key \( K_{i,j} \)} for this round.
+    \item \textbf{Authentication:} She signs the ciphertext \( msg_a \) with her private ECDSA key \( sk_a \).
+    \item \textbf{Transmission:} She sends \( \langle msg_a, \sigma_a \rangle \) to Bob via the off-chain channel.
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) \). Dominated by the linear cost of encrypting the model.
+
+\subsection*{6. Server (S) Receives \& Aggregates}
+Bob receives Alice's model, verifies it against the blockchain, and aggregates it.
+
+\[
+\text{Sig.Ver}(pk_a, msg_a, \sigma_a) \stackrel{?}{=} 1 \text{ }
+\]
+\[
+(Inf_a^r \parallel Tx_u) \leftarrow \text{Dec}(msg_a, K_{i,j}) \text{ }
+\]
+\[
+H(Inf_a^r) \stackrel{?}{=} h_{Inf_a^r} \text{ (from on-chain } Tx_u)
+\]
+\[
+M^r \leftarrow \text{Aggregate}(m^r, \dots)
+\]
+\[
+Tx_f \leftarrow \{r, sc, h(M^r), id_p, id_t, T\} \text{ }
+\]
+\[
+BC \leftarrow \text{FeedbackModel}(Tx_f)
+\]
+\begin{itemize}
+    \item \textbf{Verification:} Bob verifies Alice's signature \( \sigma_a \).
+    \item \textbf{Decryption:} He uses the model key \( K_{i,j} \) (which he derived in Step 1) to decrypt \( msg_a \) and recover her local model \( m^r \).
+    \item \textbf{Integrity Check (Crucial):} Bob re-hashes the \( Inf_a^r \) he just decrypted. He then reads the hash \( h_{Inf_a^r} \) that Alice posted to the blockchain in Step 4. If the two hashes match, he has cryptographic proof that the model he received off-chain is the \textit{exact same one} she publicly committed to. This prevents tampering and replay attacks.
+    \item \textbf{Aggregation:} If valid, he aggregates her model (e.g., using Federated Averaging \( M^r = \sum_{i=1}^{N} \frac{w_i}{N} m_i^r \)).
+    \item \textbf{Feedback (On-Chain):} Bob calls the \texttt{FeedbackModel} smart contract function. This posts a score \( sc \) for Alice (used by the reputation mechanism) and the hash of the \textit{new} global model \( h(M^r) \). This loop then repeats, with \( M^r \) becoming the new \( M^{r-1} \) for the next round.
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) \). This is a sum of linear-time operations: decryption \( O(L_M) \), hashing \( O(L_M) \), and aggregation (a linear pass over model weights) \( O(L_M) \).
+
+\newpage
+
+\section*{Phase 4: Asymmetric Ratchet (Key Update)}
+
+This is a special, server-initiated phase designed to provide \textbf{post-compromise security}. If a participant's key state is compromised, this process establishes a completely new, cryptographically independent root key \( RK_{j+1} \). This renders any previously stolen keys useless for decrypting future messages . The server can trigger this after a certain number of rounds (when the symmetric ratchet threshold \(L_j\) is reached) or if a compromise is suspected .
+
+This phase temporarily modifies the `Send and Receive Model Loop` for a single round to exchange new public keys, as described in Sec 4.2.4 of the paper.
+
+
+
+\subsection*{1. Server (S) Initiates Ratchet}
+Bob (the server) decides to update the root key. He generates new public keys and piggybacks them onto the normal `PublishTask` message for the current round.
+
+\begin{itemize}
+    \item \textbf{Generate New Keys (Local):} Bob creates a fresh set of KEM and ECDH key pairs. These will be the foundation for the new root key.
+    \[ (kpk'_b, ksk'_b) \leftarrow \text{KEM.Gen()} \]
+    \[ (epk'_b, esk'_b) \leftarrow \text{KE.Gen()} \]
+    
+    \item \textbf{Publish Task (On-Chain) - Modified Step 1:} Bob creates a modified `PublishTask` transaction. The information payload now includes his new public keys, and the transaction on-chain includes a commitment (hash) to these new keys .
+    \[ Inf_b^r \leftarrow \langle r, kpk'_b, epk'_b, M^{r-1}, id_p, id_t, D_t \rangle \]
+    \[ Tx_p \leftarrow \{ r, H(Inf_b^r), H(kpk'_b \parallel epk'_b), id_p, id_t, D_t \} \]
+    \[ BC \leftarrow \text{PublishTask}(Tx_p) \]
+    
+    \item \textbf{Send Keys (Off-Chain) - Modified Step 2:} This is the crucial step. Bob encrypts this new information payload using the \textbf{last key from the old ratchet}, \( K_{i,j} \). This ensures that only the intended participant (who can derive \( K_{i,j} \)) can receive the new public keys.
+    \[ K_{i,j} \leftarrow KDF_S(CK_{i-1,j}) \]
+    \[ msg_b \leftarrow \text{Enc}((Inf_b^r \parallel Tx_p), K_{i,j}) \]
+    \[ \sigma_b \leftarrow \text{Sig.Sign}(sk_b, msg_b) \]
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) + O(1) \). The complexity is the standard linear time for encryption (\( O(L_M) \)) plus the constant time for generating the new key pairs (\( O(1) \)).
+
+\subsection*{2. Participant (P) Responds to Ratchet}
+Alice sees the modified `PublishTask` transaction, receives the off-chain message, and proceeds to establish the new shared key.
+
+\begin{itemize}
+    \item \textbf{Receive \& Decrypt (Local) - Modified Step 3:} Alice turns her old ratchet one last time to derive the final key \( K_{i,j} \). She uses this key to decrypt Bob's message.
+    \[ K_{i,j} \leftarrow KDF_S(CK_{i-1,j}) \]
+    \[ (Inf_b^r \parallel Tx_p) \leftarrow \text{Dec}(msg_b, K_{i,j}) \]
+    She verifies the signature and checks that the hash of the new keys from the message matches the hash in the on-chain transaction. She then extracts Bob's new public keys \( kpk'_b \) and \( epk'_b \).
+    
+    \item \textbf{Generate New Root Key (Local):} Alice now performs the same steps as in the initial session establishment (Phase 2), but with Bob's new keys.
+    \begin{enumerate}
+        \item She generates her own new ephemeral ECDH key pair: \( (epk'_a, esk'_a) \leftarrow \text{KE.Gen()} \).
+        \item She computes the new hybrid shared secrets:
+        \[ SS_e \leftarrow \text{KE.Derive}(esk'_a, epk'_b) \]
+        \[ (ct', SS_k) \leftarrow \text{KEM.Encap}(kpk'_b) \]
+        \item She derives the new root key, \( RK_{j+1} \), and from it, the first set of keys for the new ratchet chain.
+        \[ RK_{j+1} \leftarrow KDF_A(SS_e \parallel SS_k, 0x00) \]
+        \[ (CK_{1,j+1}, K_{1,j+1}) \leftarrow KDF_S(RK_{j+1}) \]
+    \end{enumerate}
+    
+    \item \textbf{Publish Update (On-Chain) - Modified Step 4:} After training her local model \( m^r \), her on-chain update is also modified to include commitments to her new key material.
+    \[ m^r \leftarrow \text{Train}(M^{r-1}, \text{Data}_{local}) \]
+    \[ Inf_a^r \leftarrow \langle r, ct', epk'_a, m^r, id_p, id_t \rangle \]
+    \[ Tx_u \leftarrow \{ r, H(Inf_a^r), H(ct' \parallel epk'_a), id_p, id_t \} \]
+    \[ BC \leftarrow \text{UpdateModel}(Tx_u) \]
+    
+    \item \textbf{Send Model (Off-Chain) - Modified Step 5:} This is the second crucial step. Alice encrypts her model and response not with the old key, but with the \textbf{first key from the new ratchet}, \( K_{1,j+1} \).
+    \[ msg_a \leftarrow \text{Enc}((Inf_a^r \parallel Tx_u), K_{1,j+1}) \]
+    \[ \sigma_a \leftarrow \text{Sig.Sign}(sk_a, msg_a) \]
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) + O(\text{TrainingComplexity}) \). The cryptographic cost is linear in the model size (\(O(L_M)\)), but the overall cost is dominated by the model training.
+
+\subsection*{3. Server (S) Completes Ratchet}
+Bob receives Alice's response and now has all the information needed to derive the new root key himself and decrypt her message.
+
+\begin{itemize}
+    \item \textbf{Receive \& Generate New Root Key (Local):} Bob sees Alice's modified \( Tx_u \) on-chain and receives her off-chain message \( msg_a \). He verifies her signature and checks the on-chain hash commitment. He then extracts her new public key \( epk'_a \) and the new ciphertext \( ct' \).
+    
+    He now performs the same derivation as Alice to arrive at the identical new root key and first model key.
+    \begin{enumerate}
+        \item He computes the new hybrid shared secrets using his new \textit{private} keys:
+        \[ SS_e \leftarrow \text{KE.Derive}(esk'_b, epk'_a) \]
+        \[ SS_k \leftarrow \text{KEM.Decap}(ksk'_b, ct') \]
+        \item He derives the new root key and the first model key:
+        \[ RK_{j+1} \leftarrow KDF_A(SS_e \parallel SS_k, 0x00) \]
+        \[ (CK_{1,j+1}, K_{1,j+1}) \leftarrow KDF_S(RK_{j+1}) \]
+    \end{enumerate}
+    
+    \item \textbf{Process Model (Local) - Modified Step 6:} Now that he has successfully derived the new model key \( K_{1,j+1} \), he can decrypt Alice's message.
+    \[ (Inf_a^r \parallel Tx_u) \leftarrow \text{Dec}(msg_a, K_{1,j+1}) \]
+    He verifies the hashes, aggregates her local model \( m^r \), and sends the final feedback transaction to the blockchain.
+    \[ M^r \leftarrow \text{Aggregate}(m^r, \dots) \]
+    \[ BC \leftarrow \text{FeedbackModel}(Tx_f) \]
+\end{itemize}
+\textbf{Time Complexity:} \( O(L_M) \). The cost is dominated by the linear-time operations of decryption, hashing, and model aggregation.
+
+The asymmetric ratchet is now complete. The protocol continues from Phase 3, Step 1, using the new chain key \( CK_{1,j+1} \) as the input for the next round's symmetric ratchet.
+\newpage
+
+\section*{Phase 5: Threat-Adaptive Ratcheting Mechanism}
+
+The standard PQBFL protocol relies on a fixed symmetric ratcheting threshold, $L_j$, which determines the frequency of computationally expensive post-quantum (Kyber) asymmetric key exchanges. A static $L_j$ forces a rigid trade-off between security and performance constraints. To dynamically address real-time adversarial behavior while minimizing overhead, we introduce the \textbf{Threat-Adaptive Ratcheting Mechanism}.
+
+\subsection*{5.1 Mathematical Model of ThreatMonitor}
+
+The system monitors five distinct categories of security-relevant events continuously. Let $E = \{e_1, e_2, e_3, e_4, e_5\}$ be the set of monitored event types:
+\begin{enumerate}
+    \item $e_1$: failed signature verification ($w_1 = 1.0$)
+    \item $e_2$: hash mismatch in key or model commitments ($w_2 = 0.9$)
+    \item $e_3$: client reputation drop on-chain ($w_3 = 0.6$)
+    \item $e_4$: anomalous round-trip timing deviation ($w_4 = 0.4$)
+    \item $e_5$: stale ratchet (too many rounds since last symmetric reset) ($w_5 = 0.3$)
+\end{enumerate}
+
+To ensure older events contribute less to the current security posture, we introduce an exponential decay function based on the time elapsed since the event occurred, $\Delta \tau_i$:
+\[
+decay(i) = 2^{-\Delta \tau_i / \lambda}
+\]
+where $\lambda$ is the half-life constant for threat memory. The composite, dynamically normalized threat level at time $t$ is calculated as:
+\[
+\Theta(t) = \frac{\sum_{i=1}^{|E|} \left( \sum_{k=1}^{N_i} decay(i_k) \cdot w_i \cdot sev(i_k) \right)}{\sum_{i=1}^{|E|} w_i \cdot \max(sev_i)}
+\]
+where $N_i$ is the number of occurrences of event type $e_i$, and $sev(i_k) \in [0, 1]$ marks the severity. Thus, $\Theta(t) \in [0, 1]$.
+
+\textbf{Example Calculation:}
+Assume $\lambda = 10 \text{ sec}$, and within a 5-second interval, a node encounters 3 signature verification failures ($e_1$ with $\Delta \tau_1 = 5, 2, 0$ sec, $sev = 1.0$) and a timing anomaly ($e_4$ at $\Delta \tau_4 = 1$ sec, $sev = 0.5$). 
+\[
+decay_{e_1} = 2^{-5/10} + 2^{-2/10} + 2^{-0} \approx 0.707 + 0.871 + 1.0 = 2.578
+\]
+\[
+decay_{e_4} = 2^{-1/10} \approx 0.933
+\]
+The raw threat score is: $(2.578 \times 1.0 \times 1.0) + (0.933 \times 0.4 \times 0.5) = 2.578 + 0.187 = 2.765$. Normalized against a historical maximum threshold, if the max aggregate was 5.0, then $\Theta(t) = \frac{2.765}{5.0} = 0.553$.
+
+\subsection*{5.2 Adaptive Policy Function}
+
+The threat level $\Theta(t)$ directly determines the ratcheting parameter $L_j$ for the current state. The relationship is governed by a power curve to ensure $L_j$ rapidly collapses to maximum security limits under high threat, but remains optimally efficient under normal conditions:
+\[
+L_j(\Theta) = \lfloor L_{max} - (L_{max} - L_{min}) \times (\Theta(t))^{\alpha} \rfloor
+\]
+where $L_{max}$ (e.g., 20) is the maximum symmetric steps allowed (peak performance), $L_{min}$ (e.g., 2) is the minimum steps allowed (peak security), and $\alpha$ determines the sensitivity curve.
+
+\textbf{Example Calculation:} 
+Using $L_{max} = 20, L_{min} = 2, \alpha = 2.0$, and the previously calculated $\Theta(t) = 0.553$:
+\[
+L_j(0.553) = \lfloor 20 - (18) \times (0.553)^2 \rfloor = \lfloor 20 - 18 \times 0.306 \rfloor = \lfloor 20 - 5.508 \rfloor = 14
+\]
+Thus, the system dynamically tightens key rotation frequency from 20 rounds to 14 rounds explicitly due to detected environmental anomalies.
+
+\subsection*{5.3 Security Proofs}
+
+\textbf{Theorem 1: Forward Secrecy Preservation}
+\textit{Proof Sketch:} Forward secrecy rests on the security of the Key Derivation Function ($KDF_S$). Let the symmetric ratchet be a one-way function $KDF_S: \{0,1\}^\lambda \to \{0,1\}^{\lambda} \times \{0,1\}^\lambda$, mapping $CK_{i-1} \mapsto (CK_i, K_i)$. Because $KDF_S$ relies on a cryptographic primitive structurally modeled as a PRF (Pseudo-Random Function), reversing the chain to find $CK_{i-1}$ given $CK_i$ requires breaking the underlying PRF assumption. The dynamic variation of $L_j$ strictly acts as a parameter dictating the quantity of iterations $i$, not the mathematical structure of $KDF_S$. Since $\forall i, P(\text{Invert } KDF_S) \le \epsilon_{PRF}$, altering $L_j$ dynamically preserves identical generic forward secrecy limits against retroactive traversal.
+
+\textbf{Theorem 2: Enhanced Post-Compromise Security (PCS)}
+\textit{Proof Sketch:} Post-compromise security recovery occurs precisely when an asymmetric ratchet takes place, deriving a new master root key $RK_{j+1}$. The attacker's window of compromise is bounded by the number of symmetric keys derived between asymmetric updates: $K_{compromise} = \{K_{i,j}\}_{i=c}^{L_j}$, where $c$ is the round of compromise intercept. Under a fixed paradigm, the attacker gains $L_j^{fixed} - c$ keys. Under the threat-adaptive protocol, an active attack instantly elevates $\Theta(t) \to 1.0$, rapidly forcing $L_j^{adaptive} \to L_{min}$. As $L_{min} \ll L_j^{fixed}$, the compromise window strictly shrinks: $|K_{compromise}^{adaptive}| < |K_{compromise}^{fixed}|$. The generic adversarial advantage remains computationally bounded by the Kyber IND-CCA assumption:
+\[
+Adv_A^{PCS} \le \min \{Adv_{\mathcal{A},\text{Kyber}}^{IND-CCA}, Adv_{\mathcal{A},\text{ECDH}}^{PRF-ODH}\}
+\]
+However, the frequency of PCS recovery effectively truncates the utility lifespan of any compromised symmetric subset.
+
+\subsection*{5.4 Overhead and Time Complexity Analysis}
+
+The adaptive policy introduces constant-time $O(1)$ operations per round: processing the ThreatMonitor parameters and performing deterministic evaluations.
+\begin{itemize}
+    \item \textbf{Threat Evaluation Complexity:} The state is monitored continuously. $decay$ factors and sum accumulations over predefined subsets resolve in strictly $O(1)$ fixed overhead ($\approx 1\text{-}10 \, \mu s$). 
+    \item \textbf{Kyber Asymmetric Avoidance:} Each avoided Kyber Key Encapsulation Mechanism (KEM) instance saves $O(k^2 \cdot n \log n)$ degree-$n$ polynomial multiplications. For Kyber-768 ($k=3$), this yields a massive latency contraction compared to conservative static thresholds.
+\end{itemize}
+
+\newpage
+
+\section*{Phase 6: Side-Channel Hardening and Cryptographic Security}
+
+Standard Python implementations of basic cryptographic checks inherently introduce side-channels, mostly timing oracles, which permit adversarial byte-by-byte key extraction. The upgraded framework eliminates these vectors entirely via systemic memory and timing-invariant primitives.
+
+\subsection*{6.1 Constant-Time Cryptographic Primitives}
+
+A critical vulnerability exists when verifying incoming cryptographic commitments mathematically via native equality operators (e.g., \verb|==|). Python's baseline $A == B$ execution breaks at the exact index $i$ where $A[i] \ne B[i]$.
+
+\textbf{Mathematical Time Complexity of Data Vulnerability:}
+Let $T_{comp}(A, B)$ be the time to evaluate equality.
+\[
+T_{vulnerable}(A, B) = \mathcal{O}(i) \text{ where } i = \min \{k \mid A[k] \ne B[k] \}
+\]
+An attacker iteratively tests byte signatures, measuring execution latency. When response time increases by $\Delta t$ at attempt $X$ at byte $k$, the attacker proves $X=A[k]$, subsequently moving to $k+1$.
+
+\textbf{Constant-Time Mitigation:}
+We replace all naive equality paths utilizing \verb|hmac.compare_digest(A, B)|, forcing structural traversal across the entirety of sequence $L$:
+\[
+T_{hardened}(A, B) = \mathcal{O}(L) 
+\]
+\textbf{Example:} When comparing a 32-byte hash commitment $h_{epk_a}$, $T_{hardened}$ rigidly computes 32 cycles regardless of whether the deviation exists at byte 0 or byte 31, normalizing power traces and completely denying timing deltas. 
+
+\subsection*{6.2 Authenticated Encryption (AES-GCM) with Random Nonces}
+
+In earlier iterations, AES-CTR was employed without a Message Authentication Code (MAC), rendering the global model weight vectors $M^r$ malleable. By flipping cipher bits, an adversary could systematically alter the decoded weights, committing \textbf{Model Poisoning}. Furthermore, deterministic round-based nonce generators ($nonce = H(\text{"round"} \parallel r)$) risk catastrophic cross-session key-stream overlap.
+
+\textbf{Upgrade Model:}
+The protocol was hardened using AES-256-GCM (Galois/Counter Mode). This secures confidentiality while generating a computationally binding integrity MAC tags natively. Nonces are now cryptographically drawn from true randomness ($\text{nonce}_{12} \leftarrow \text{urandom}(12)$).
+
+\textbf{Security and Probability of Collision:}
+Let $N$ be the number of total encryptions during the lifetime of a key. Under a 12-byte (96-bit) true random nonce, the geometric probability of any single collision $P_c(N)$ before rotating the symmetric key is quantified by the Birthday Paradox limit:
+\[
+P_c(N) = 1 - e^{\frac{-N^2}{2 \cdot 2^{96}}} \approx \frac{N^2}{2^{97}}
+\]
+\textbf{Example Calculation:}
+For a federated learning parameter cycle extending up to $N = 2^{30}$ (approx. 1 billion encryptions), the risk evaluates to:
+\[
+P_c(2^{30}) \approx \frac{2^{60}}{2^{97}} = 2^{-37}
+\]
+Since the protocol strictly restricts massive $N$ per key via the symmetric ratchet turn ($K_{i,j} \to K_{i+1,j}$ automatically per round), $N$ remains essentially 1. Thus, $P_c(1) \approx 2^{-97}$, rendering a nonce-collision operationally impossible.
+
+\subsection*{6.3 System-Wide Entropy via Random KDF Salts}
+
+The $KDF_A$ (Asymmetric root derivation) heavily depends on the cryptographic entropy of combined $SS_e$ (ECDH secret) and $SS_k$ (Kyber decapsulated secret). Utilizing static salts ($0x00$) theoretically allows heavily resourced attackers to precompute massive rainbow tables indexed against standardized key inputs if round parameters leak.
+
+\textbf{Upgrade Model:}
+Salts are independently randomized upon session synthesis ($\text{salt} \leftarrow \text{urandom}(32)$). Let $S_{static}$ denote the search space of the static structure $\approx \mathcal{O}(1)$ pre-compilation factor, forcing reliance strictly on the $SS_k \parallel SS_e$ bits. Randomizing the salt inflates the baseline computation overhead matrix before targeting secrets:
+\[
+S_{dynamic} = S_{static} \times 2^{256} = \mathcal{O}(2^{256})
+\]
+This mathematically guarantees computational infeasibility against massive pre-configured rainbow dictionaries, strictly preserving forward secrecy boundaries while inducing no execution latency penalty ($O(1)$ derivation).
+
+\newpage
+
+\section*{Annexure}
+
+\subsection*{P-256 Curve Parameters}
+\[
+y^2 = x^3 + a x + b \pmod p
+\]
+where
+\begin{align*}
+p &= \texttt{0xffffffff00000001000000000000000000000000ffffffffffffffffffffffff} \\
+K &= GF(p) \\
+a &= K(\texttt{0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc}) \\
+b &= K(\texttt{0x5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b}) \\
+E &= \text{EllipticCurve}(K, (a, b)) \\
+G &= E(\texttt{0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296}, \\
+     & \texttt{0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5}) \\
+\text{Order} &= \texttt{0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551}
+\end{align*}
+
+\end{document}

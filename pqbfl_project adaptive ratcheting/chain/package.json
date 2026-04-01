@@ -1,0 +1,15 @@
+{
+  "name": "pqbfl-chain",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "node": "hardhat node",
+    "compile": "hardhat compile",
+    "deploy:local": "hardhat run --network localhost scripts/deploy.js"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.18",
+    "ethers": "^6.13.4",
+    "@nomicfoundation/hardhat-ethers": "^3.0.9"
+  }
+}

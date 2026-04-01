@@ -1,0 +1,17 @@
+# Python
+python/.venv/
+python/**/__pycache__/
+python/**/*.pyc
+python/.pytest_cache/
+
+# Node / Hardhat
+chain/node_modules/
+chain/cache/
+
+# OS / tooling
+.DS_Store
+.git/
+.gitignore
+
+# Large build artifacts (kept on host; container can rebuild)
+chain/artifacts/

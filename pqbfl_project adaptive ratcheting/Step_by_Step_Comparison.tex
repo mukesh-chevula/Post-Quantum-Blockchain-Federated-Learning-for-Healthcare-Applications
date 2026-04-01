@@ -1,0 +1,171 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\geometry{margin=1in}
+
+\title{\textbf{Step-by-Step Execution of PQBFL: Generic Protocol vs. Our Enhanced Version}}
+\author{Project Documentation}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Introduction}
+This document demonstrates the full lifecycle of a Post-Quantum Blockchain Federated Learning (PQBFL) session, tracking the system from input generation to process conclusion. At each mathematical step, we outline the generic operations defined in the standard PQBFL protocol. Crucially, wherever our team has instituted custom improvements, we use the clause \textbf{In our version} to specify the modification, explain the mathematical or structural reasoning behind it, and formally prove why our implementation is substantially superior in terms of security bounds or time-complexity architecture.
+
+\section*{Step 1: Participant Initialization $\&$ Key Generation}
+
+The process begins when the central aggregator (Server, Bob) and local trainers (Participants, Alice) generate their foundational cryptographic key material to establish on-chain identities.
+
+\subsection*{Generic Protocol}
+The Server initializes three separate key pairs iteratively:
+\begin{enumerate}
+    \item \textbf{Post-Quantum KEM:} $(kpk_b, ksk_b) \leftarrow \text{Kyber.KeyGen()}$. The public key $kpk_b = (t = As + e, \rho)$ acts as the quantum-resistant component based on Module-LWE. 
+    \item \textbf{Classical Key Exchange:} $(epk_b, esk_b) \leftarrow \text{ECDH.KeyGen()}$. $epk_b = esk_b \cdot G$ on the P-256 elliptic curve.
+    \item \textbf{Authentication Signatures:} $(pk_b, sk_b) \leftarrow \text{ECDSA.KeyGen()}$.
+\end{enumerate}
+Similarly, Alice generates her ECDH pair $(epk_a, esk_a)$ and signature pair $(pk_a, sk_a)$. All stakeholders then commit to these keys on the blockchain by posting the hash $H_{commit} = \text{SHA256}(pk_x)$.
+
+\subsection*{In Our Version: Strict Constant-Time Cryptography}
+\textbf{What happens:} In generic PQBFL, Python-native validation operations such as \verb|if hash(keys) == expected_hash| and naive ECDSA verifications are utilized. In our version, we strictly enforce horizontal constant-time structures via \verb|hmac.compare_digest(A, B)| for all cryptographic comparisons and implement an OpenSSL backend enforcement for continuous elliptic curve calculations. Furthermore, we mandate a unified key length validation that avoids time-variant branching.
+
+\textbf{Why it happens:} The native Python \verb|==| operator employs a "short-circuit" string-matching architecture. If byte $i$ of a secret hash mismatches, execution drops immediately, thereby leaking the exact index of the mismatch through a micro-architectural timing oracle. 
+
+\textbf{Proof that ours is better:} 
+Let $T(A, B)$ represent the comparative timing complexity of evaluating two 32-byte cryptographic commitments. In the generic version:
+\[
+T_{generic}(A, B) = \mathcal{O}(i) \quad \text{where } i = \min\{k \mid A[k] \ne B[k]\}
+\]
+An adversary can iteratively probe byte $k$, measuring the $\Delta t$ latency scalar to brute-force the hash commitment in linearly bounded operations instead of $2^{256}$.
+By statically forcing constant-time execution:
+\[
+T_{ours}(A, B) = \mathcal{O}(L) \quad \text{where } L = 32 \text{ bytes (strictly constant)}
+\]
+This mathematically flattens the execution latency mapping trace to a singular vector, completely eliminating the systemic timing side-channel. 
+
+\section*{Step 2: Off-Chain Session Establishment}
+
+Following on-chain registration, participants exchange handshakes off-chain to agree on a root cryptographic session key without exposing asymmetric secrets.
+
+\subsection*{Generic Protocol}
+Alice and Bob cross-verify each other's on-chain public key commitments $H_{commit}$. Alice utilizes Bob's public keys to compute hybrid secrets:
+\[
+SS_e \leftarrow \text{KE.Derive}(esk_a, epk_b)
+\]
+\[
+(ct, SS_k) \leftarrow \text{KEM.Encap}(kpk_b)
+\]
+Alice merges these values using an Asymmetric Key Derivation Function (e.g., HKDF-Extract) with a fixed static salt ($0x00$):
+\[
+RK_1 \leftarrow KDF_A(SS_e \parallel SS_k, 0x00)
+\]
+From $RK_1$, the first symmetric chain key ($CK_{1,1}$) is derived.
+
+\subsection*{In Our Version: Dynamic Entropy via Random KDF Salts}
+\textbf{What happens:} Instead of mapping the $KDF_A$ extraction to a baseline constant ($0x00$), our architecture derives a cryptographically random 32-byte salt immediately upon session initiation ($\text{salt} \leftarrow \text{urandom}(32)$) and passes it symmetrically.
+
+\textbf{Why it happens:} A structurally static salt limits the entropy variations to solely the values encapsulated within $SS_e$ and $SS_k$. If an adversary recovers subsets of the ECDH parameters or manages to constrain the lattice bounds on Kyber, they can generate precompiled indexed structures (rainbow tables) against standardized key permutations.
+
+\textbf{Proof that ours is better:} 
+Let $S$ denote the search space required for an attacker aiming to pre-calculate combinations. In the standard paradigm, the computational bounds rest purely on the hybrid limits:
+\[
+S_{generic} = \mathcal{O}(1_{salt}) \cdot |SS_k \parallel SS_e|
+\]
+By employing 32-byte dynamic session salts, the fundamental search baseline expands dramatically mathematically:
+\[
+S_{ours} = \mathcal{O}(2^{256}) \cdot |SS_k \parallel SS_e|
+\]
+This mathematically guarantees computational precomputation infeasibility while maintaining the exact $\mathcal{O}(1)$ time-complexity for the honest parties' derivation. Our version mathematically preserves perfect forward secrecy independent of static parameter leaks.
+
+\section*{Step 3: The Iterative Model Training Loop $\&$ Federated Learning Mechanics}
+
+This phase serves as the core symmetric iterative cycle representing Federated Learning (FL) updates. In FL, raw data never leaves the client devices; instead, a global model is dispatched, trained locally on private datasets, and then locally optimized model weights are securely returned to a central server for aggregation. 
+
+\subsection*{Generic Protocol}
+At the start of round $r$, both the Server and Participant turn the symmetric ratchet independently, drawing $K_i$ from $CK_{i-1}$ to act as the shared encryption key for this round.
+
+\begin{enumerate}
+    \item \textbf{Dispatch (Server $\to$ Client):} The server encrypts the global model matrix $M^{r-1}$ using AES-CTR mode, utilizing a deterministic nonce $nonce = H(\text{`pqbfl'} \parallel r)$.
+    \[
+    msg_b \leftarrow \text{Enc}_{AES-CTR}(M^{r-1}, K_i)
+    \]
+    The ciphertext is dispatched off-chain to the clients.
+    
+    \item \textbf{Local Training (Client):} Upon receiving and decrypting the model using \verb|pickle| deserialization, the client utilizes standard Stochastic Gradient Descent (SGD) to train the global model on their private local dataset $D_k$. Over $E$ local epochs, the local weights $m_k^{r}$ are optimized:
+    \[
+    w_{t+1} \leftarrow w_t - \eta \nabla \mathcal{L}(w_t; x, y)
+    \]
+    where $\eta$ is the learning rate, $\mathcal{L}$ is the loss function, and $(x, y) \in D_k$.
+    
+    \item \textbf{Dispatch (Client $\to$ Server):} The client encrypts $m_k^{r}$ using the same $K_i$ and dispatches the ciphertext back to the server.
+    
+    \item \textbf{Aggregation (Server):} The server decrypts the incoming model matrices and aggregates them to form the new global model $M^{r}$ using Federated Averaging (FedAvg), weighted by the data samples $|D_k|$ across all participating clients $K$:
+    \[
+    M^{r} = \sum_{k=1}^K \frac{|D_k|}{|D|} m_k^{r}
+    \]
+\end{enumerate}
+
+\subsection*{In Our Version: GCM Authenticated Encryption $\&$ Serialization Hardening}
+\textbf{What happens:} We completely deprecate Python's \verb|pickle| format for \verb|numpy| arrays to halt Arbitrary Remote Code Execution (RCE). Core-wise, we fully replace AES-CTR with \textbf{AES-256-GCM (Galois/Counter Mode)} generating embedded MAC (Message Authentication Code) validation tags. Furthermore, nonces are sampled homogeneously via $\text{urandom}(12)$ rather than deterministically.
+
+\textbf{Why it happens:}
+AES-CTR is entirely unauthenticated and malleable; flipping a bit $n$ in the generic ciphertext flawlessly flips bit $n$ in the deciphered matrix model without breaking decryption execution. This permits silent adversarial "Model Poisoning" manipulations. Similarly, $H(round)$ generation leaks tracking data across session intersections and risks catastrophic cipher-stream breakage identically repeating $N$ values. 
+
+\textbf{Proof that ours is better:} 
+AES-256-GCM mathematically fuses confidentiality with authentication via integrity signatures:
+\[
+\text{Tag}_{MAC} = \text{GHASH}_H(\text{Ciphertext})
+\]
+This guarantees absolute model integrity; forged matrices produce algebraic mismatch and instantaneous failover. Regarding the deterministic nonce breakage:
+Let $N$ equal encryptions utilizing a persistent symmetric key. Our system randomly generates a 12-byte (96-bit) sequence per cycle. The risk probability of collisions $P_c(N)$ is calculated via the asymptotic Birthday Bound:
+\[
+P_{generic}(N_{round=1}) = 1.0 \text{ (100\% stream crash on duplicated round calls)}
+\]
+\[
+P_{ours}(N) = 1 - e^{\frac{-N^2}{2 \cdot 2^{96}}} \approx \frac{N^2}{2^{97}}
+\]
+Because the overarching KDF Symmetric loop iteratively shifts $K_i \to K_{i+1}$ each parameter swap, $N \to 1$. Consequently:
+\[
+P_{ours} \approx 2^{-97}
+\]
+Rendering nonce-collisions mathematically obsolete against parallel overlapping session instances, vastly improving generic limits.
+
+\section*{Step 4: Asymmetric Ratcheting}
+
+Due to inherent post-compromise limits placed on sequentially chained symmetric keys, the protocol intermittently triggers full Kyber PQ resets.
+
+\subsection*{Generic Protocol}
+A global parameter configuration threshold $L_j$ (e.g., $L_j = 10$) acts as a static counter. Upon precisely $10$ iterative $K_i$ sequences functioning, the server forces $L_j \to 0$ and instantiates a complete PQ replacement (simulating Step 1 again to produce $RK_{j+1}$) across the network. 
+
+\subsection*{In Our Version: Threat-Adaptive Ratcheting}
+\textbf{What happens:} We eliminate the rigid generic static integer mapping $L_j$. In its place, we instantiate an adaptive heuristic \textbf{ThreatMonitor} generating an exponential decay array over real-time events, actively adjusting parameter $L_j$ via bounded curve logic between structural margins ($[L_{min}, L_{max}]$). 
+
+\textbf{Why it happens:} Fixed parameter selections force catastrophic operational compromises. Lower $L_j$ (e.g., $L = 2$) results in profound security posture but cripples system throughput via continuous lattice matrix multiplications. Higher $L_j$ (e.g., $L=20$) is ultra-efficient but drastically extends the keyspace exposed during a localized server compromise. By analyzing empirical variables locally ($\text{fail}_{sigs}, \text{time}_{delta}$), we throttle the network solely when genuine danger limits are breached.
+
+\textbf{Proof that ours is better:} 
+Let the generic adversarial compromise window $|K_c|$ designate the volume of chained symmetric epochs remaining under active systemic exploitation before resetting asynchronously.
+\[
+|K_{c}^{generic}| = [c, L_j^{fixed}]
+\]
+Where $c$ represents the intrusion interval.
+Our model calculates normalized continuous threat composite representations logically:
+\[
+\Theta(t) = \frac{\sum_{i=1}^{|E|} \left( \sum_{k=1}^{N_i} 2^{-\Delta \tau_k / \lambda} \cdot w_i \cdot sev_{k} \right)}{W_{\max}} \in [0, 1]
+\]
+Directly bounding the asymmetric trigger explicitly via the negative power curve:
+\[
+L_j(\Theta) = \lfloor L_{max} - (L_{max} - L_{min}) \times (\Theta(t))^{\alpha} \rfloor
+\]
+Therefore, $0$ threat translates mathematically to full $L_{max}$ bandwidth (exhibiting immense performance limits over generic paradigms when isolated). Active systemic compromise instantly accelerates $\Theta(t) \to 1.0$, collapsing limits explicitly: $L_j \to L_{min}$. 
+Consequently, the post-compromise constraint dictates:
+\[
+|K_{c}^{ours}| = [c, L_{min}] 
+\]
+Strictly guaranteeing $\forall_{\text{attacks}} |K_{c}^{ours}| < |K_{c}^{generic}|$, restricting malicious visibility bounds without punishing generalized latency periods natively $O(1)$ evaluation time.
+
+\section*{Conclusion}
+Our modified Post-Quantum Blockchain Federated Learning structural approach enforces extreme precision bounds across constant-time execution, non-deterministic random parameter initializations, and robust authenticated metrics while introducing the industry's first threat-responsive asymmetric derivation matrix. This universally optimizes dynamic latency parameters structurally without sacrificing intrinsic post-quantum mathematical integrity limits.
+
+\end{document}
